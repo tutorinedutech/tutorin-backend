@@ -1,4 +1,4 @@
-const { signInHandler, signUpHandler } = require('./handler/mainHandler');
+const { signInHandler, signUpTutorsHandler, signUpLearnersHandler } = require('./handler/mainHandler');
 
 const routes = [
   {
@@ -16,8 +16,13 @@ const routes = [
   },
   {
     method: 'POST',
-    path: '/signup',
-    handler: signUpHandler,
+    path: '/signUpTutors',
+    handler: signUpTutorsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/signUpLearners',
+    handler: signUpLearnersHandler,
   },
 ];
 

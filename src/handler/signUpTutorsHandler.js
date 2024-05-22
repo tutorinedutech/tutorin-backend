@@ -1,4 +1,4 @@
-const signUpHandler = (request, h) => {
+const signUpTutorsHandler = (request, h) => {
   const { email, username, password } = request.payload;
   return h.response({
     status: 'Success',
@@ -6,4 +6,4 @@ const signUpHandler = (request, h) => {
   }).code(201);
 };
 
-module.exports = signUpHandler;
+module.exports = signUpTutorsHandler;

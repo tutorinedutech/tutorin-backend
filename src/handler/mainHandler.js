@@ -1,4 +1,5 @@
 const signInHandler = require('./signInHandler');
-const signUpHandler = require('./signUpHandler');
+const signUpTutorsHandler = require('./signUpTutorsHandler');
+const signUpLearnersHandler = require('./signUpLearnersHandler');
 
-module.exports = { signInHandler, signUpHandler };
+module.exports = { signInHandler, signUpTutorsHandler, signUpLearnersHandler };
