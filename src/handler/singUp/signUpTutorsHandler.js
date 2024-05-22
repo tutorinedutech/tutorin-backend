@@ -1,6 +1,16 @@
-const crypto = require('crypto');
 const tutors = require('./tutors');
 
+// Error Handler
+const createErrorResponse = (h, message) => {
+  const response = h.response({
+    status: 'fail',
+    message,
+  });
+  response.code(400);
+  return response;
+};
+
+// Nilai yang didapat dari user
 const signUpTutorsHandler = (request, h) => {
   const {
     email,
@@ -15,107 +25,28 @@ const signUpTutorsHandler = (request, h) => {
     ktp,
   } = request.payload;
 
-  if (!email) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Your email is invalid',
-    });
-    response.code(400);
-    return response;
+  // Melakukan pengecekan jika ada nilai yang kosong
+  const requiredFields = {
+    email,
+    phoneNumber,
+    username,
+    password,
+    educationLevel,
+    gender,
+    domicile,
+    languages,
+    teachingCriteria,
+    ktp,
+  };
+
+  for (const [key, value] of Object.entries(requiredFields)) {
+    if (!value) {
+      return createErrorResponse(h, `${key} is required to create account`);
+    }
   }
 
-  if (!phoneNumber) {
-    const response = h.response({
-      status: 'fail',
-      message: 'phoneNumber is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!username) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Username is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!password) {
-    const response = h.response({
-      status: 'fail',
-      message: 'Password is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!educationLevel) {
-    const response = h.response({
-      status: 'fail',
-      message: 'educationLevel is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!gender) {
-    const response = h.response({
-      status: 'fail',
-      message: 'gender is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!domicile) {
-    const response = h.response({
-      status: 'fail',
-      message: 'domicile is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!languages) {
-    const response = h.response({
-      status: 'fail',
-      message: 'languages is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!teachingCriteria) {
-    const response = h.response({
-      status: 'fail',
-      message: 'teachingCriteria is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  if (!ktp) {
-    const response = h.response({
-      status: 'fail',
-      message: 'ktp is required to create account',
-    });
-    response.code(400);
-    return response;
-  }
-
-  // Validasi semua bidang yang diperlukan
-  if (!email || !phoneNumber || !username || !password || !educationLevel || !gender || !domicile || !languages || !teachingCriteria || !ktp) {
-    return h.response({
-      status: 'error',
-      message: 'validation error: some fields are missing or invalid.',
-    }).code(400);
-  }
-
-  const id = crypto.randomUUID();
+  // Nilai kembalian yang didapat
   const newTutors = {
-    id,
     email,
     phoneNumber,
     username,
@@ -142,14 +73,14 @@ const signUpTutorsHandler = (request, h) => {
   tutors.push(newTutors);
 
   // Memeriksa apakah tutor berhasil ditambahkan
-  const isSuccess = tutors.some((tutor) => tutor.id === id);
+  const isSuccess = tutors.some((tutor) => tutor.email === email);
 
   if (isSuccess) {
     return h.response({
       status: 'success',
       message: 'tutor registered successfully.',
       data: {
-        tutorId: id,
+        tutorEmail: email,
         username,
       },
     }).code(201);
