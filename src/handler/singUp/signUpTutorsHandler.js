@@ -108,6 +108,7 @@ const signUpTutorsHandler = (request, h) => {
       message: `Hi ${username}! You have successfully signed up with ${email}`,
       data: {
         tutorId: id,
+        username,
       },
     }).code(201);
   }
