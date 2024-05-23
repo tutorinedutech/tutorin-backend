@@ -29,6 +29,7 @@ model Students {
   id              Int      @id @default(autoincrement())
   user_id         Int
   education_level String
+  phone_number String
   user            Users    @relation(fields: [user_id], references: [id])
 
   schedules      Schedules[]
@@ -45,6 +46,10 @@ model Tutors {
   languages        String
   subjects         String
   teaching_criteria String
+  phone_number      String
+  rekening_number  String
+  availability     String
+  studied_method   String
   user             Users     @relation(fields: [user_id], references: [id])
 
   schedules       Schedules[]
