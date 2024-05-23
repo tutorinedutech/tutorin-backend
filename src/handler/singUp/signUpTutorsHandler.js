@@ -1,4 +1,7 @@
+const { PrismaClient } = require('@prisma/client');
 const tutors = require('./tutors');
+
+const prisma = new PrismaClient();
 
 // Error Handler
 const createErrorResponse = (h, message) => {
@@ -11,7 +14,7 @@ const createErrorResponse = (h, message) => {
 };
 
 // Nilai yang didapat dari user
-const signUpTutorsHandler = (request, h) => {
+const signUpTutorsHandler = async (request, h) => {
   const {
     email,
     phoneNumber,
@@ -23,6 +26,10 @@ const signUpTutorsHandler = (request, h) => {
     languages,
     teachingCriteria,
     ktp,
+    subjects,
+    rekeningNumber,
+    availability,
+    studiedMethod,
   } = request.payload;
 
   // Melakukan pengecekan jika ada nilai yang kosong
@@ -37,6 +44,10 @@ const signUpTutorsHandler = (request, h) => {
     languages,
     teachingCriteria,
     ktp,
+    subjects,
+    rekeningNumber,
+    availability,
+    studiedMethod,
   };
 
   for (const [key, value] of Object.entries(requiredFields)) {
@@ -45,51 +56,71 @@ const signUpTutorsHandler = (request, h) => {
     }
   }
 
-  // Nilai kembalian yang didapat
-  const newTutors = {
-    email,
-    phoneNumber,
-    username,
-    password,
-    educationLevel,
-    gender,
-    domicile,
-    languages,
-    teachingCriteria,
-    ktp,
-  };
+  try {
+    // Memeriksa apakah sudah ada user dengan email, nomor telepon, atau username yang sama
+    const existingUser = await prisma.users.findFirst({
+      where: {
+        OR: [
+          { email },
+          { username },
+        ],
+      },
+    });
 
-  // Memeriksa apakah sudah ada tutor dengan email, nomor telepon, atau username yang sama
-  const isDuplicate = tutors.some((tutor) => tutor.email === email || tutor.phoneNumber === phoneNumber || tutor.username === username);
+    if (existingUser) {
+      return h.response({
+        status: 'error',
+        message: 'User already registered with the provided email, phone number, or username.',
+      }).code(400);
+    }
 
-  if (isDuplicate) {
-    return h.response({
-      status: 'error',
-      message: 'tutor already registered with the provided email, phone number, or username.',
-    }).code(400);
-  }
+    // Menggabungkan array languages menjadi string
+    const languagesString = languages.join(', ');
 
-  // Menambahkan tutor baru ke array
-  tutors.push(newTutors);
+    // Menambahkan user baru dan tutor baru dalam satu transaksi
+    const newUser = await prisma.$transaction(async (prisma) => {
+      const createdUser = await prisma.users.create({
+        data: {
+          email,
+          username,
+          password,
+        },
+      });
 
-  // Memeriksa apakah tutor berhasil ditambahkan
-  const isSuccess = tutors.some((tutor) => tutor.email === email);
+      const createdTutor = await prisma.tutors.create({
+        data: {
+          user_id: createdUser.id,
+          education_level: educationLevel,
+          phone_number: phoneNumber,
+          gender,
+          domicile,
+          languages: languagesString,
+          subjects,
+          teaching_criteria: teachingCriteria,
+          rekening_number: rekeningNumber,
+          availability,
+          studied_method: studiedMethod,
+        },
+      });
 
-  if (isSuccess) {
+      return { createdUser, createdTutor };
+    });
+
     return h.response({
       status: 'success',
-      message: 'tutor registered successfully.',
+      message: 'Tutor registered successfully.',
       data: {
-        tutorEmail: email,
-        username,
+        tutorEmail: newUser.createdUser.email,
+        username: newUser.createdUser.username,
       },
     }).code(201);
+  } catch (error) {
+    console.error(error);
+    return h.response({
+      status: 'error',
+      message: 'Failed to register tutor due to an internal error.',
+    }).code(500);
   }
-
-  return h.response({
-    status: 'error',
-    message: 'failed to register tutor due to an internal error.',
-  }).code(500);
 };
 
 module.exports = signUpTutorsHandler;

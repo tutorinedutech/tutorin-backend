@@ -46,7 +46,7 @@ model Tutors {
   languages        String
   subjects         String
   teaching_criteria String
-  phone_number     String
+  phone_number      String
   rekening_number  String
   availability     String
   studied_method   String
