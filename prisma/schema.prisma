@@ -19,17 +19,19 @@ model Users {
   username String
   password String
 
-  students Students[]
+  learners Learners[]
   tutors   Tutors[]
   sentMessages    Messages[] @relation("Sender")
   receivedMessages Messages[] @relation("Receiver")
 }
 
-model Students {
+model Learners {
   id              Int      @id @default(autoincrement())
   user_id         Int
   education_level String
   phone_number String
+  gender          String
+  domicile        String
   user            Users    @relation(fields: [user_id], references: [id])
 
   schedules      Schedules[]
@@ -62,21 +64,21 @@ model Tutors {
 
 model Schedules {
   id         Int     @id @default(autoincrement())
-  student_id Int
+  learner_id Int
   tutor_id   Int
   sessions   Int
   subject    String
-  student    Students @relation(fields: [student_id], references: [id])
+  learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
 
 model Transactions_in {
   id               Int       @id @default(autoincrement())
-  student_id       Int
+  learner_id       Int
   tutor_id         Int
   total            Float
   created_at       DateTime
-  student          Students   @relation(fields: [student_id], references: [id])
+  learner          Learners   @relation(fields: [learner_id], references: [id])
   tutor            Tutors     @relation(fields: [tutor_id], references: [id])
 }
 
@@ -112,12 +114,12 @@ model Messages {
 
 model Reviews {
   id        Int      @id @default(autoincrement())
-  student_id Int
+  learner_id Int
   tutor_id   Int
   rating    Int
   comment   String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  student   Students @relation(fields: [student_id], references: [id])
+  learner   Learners @relation(fields: [learner_id], references: [id])
   tutor     Tutors   @relation(fields: [tutor_id], references: [id])
 }

@@ -78,7 +78,7 @@ const signUpTutorsHandler = async (request, h) => {
     domicile,
     languages,
     teachingCriteria,
-    // ktp,
+    ktp,
     subjects,
     rekeningNumber,
     availability,
@@ -164,5 +164,4 @@ const signUpTutorsHandler = async (request, h) => {
     }).code(500);
   }
 };
-
 module.exports = signUpTutorsHandler;
