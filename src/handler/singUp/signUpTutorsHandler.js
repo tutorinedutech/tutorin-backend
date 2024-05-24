@@ -1,7 +1,14 @@
 const { PrismaClient } = require('@prisma/client');
-const tutors = require('./tutors');
+const { Storage } = require('@google-cloud/storage');
+const { v4: uuidv4 } = require('uuid');
 
 const prisma = new PrismaClient();
+const storage = new Storage({
+  projectId: process.env.GOOGLE_PROJECT_ID,
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
+
+const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
 // Error Handler
 const createErrorResponse = (h, message) => {
@@ -11,6 +18,34 @@ const createErrorResponse = (h, message) => {
   });
   response.code(400);
   return response;
+};
+
+// fungsi untuk upload ktp
+const uploadKtpToGCS = async (ktpFile) => {
+  try {
+    const bucket = storage.bucket(bucketName);
+    const folderName = 'arsip-ktp'; // Nama folder untuk menyimpan KTP di GCS
+    const fileName = `${folderName}/ktp_${uuidv4()}.${ktpFile.hapi.filename.split('.').pop()}`; // Generate unique filename within the folder
+    const file = bucket.file(fileName);
+
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: ktpFile.hapi.headers['content-type'],
+      },
+    });
+
+    await new Promise((resolve, reject) => {
+      stream.on('finish', resolve);
+      stream.on('error', reject);
+      ktpFile.pipe(stream);
+    });
+
+    const gcsUrl = `https://storage.googleapis.com/${bucketName}/${fileName}`;
+    return gcsUrl;
+  } catch (error) {
+    console.error('Error uploading KTP to GCS:', error);
+    throw error;
+  }
 };
 
 // Nilai yang didapat dari user
@@ -43,7 +78,7 @@ const signUpTutorsHandler = async (request, h) => {
     domicile,
     languages,
     teachingCriteria,
-    ktp,
+    // ktp,
     subjects,
     rekeningNumber,
     availability,
@@ -75,7 +110,13 @@ const signUpTutorsHandler = async (request, h) => {
     }
 
     // Menggabungkan array languages menjadi string
-    const languagesString = languages.join(', ');
+    const languagesString = Array.isArray(languages) ? languages.join(', ') : '';
+
+    // Upload KTP to GCS
+    let ktpUrl = null;
+    if (ktp) {
+      ktpUrl = await uploadKtpToGCS(ktp);
+    }
 
     // Menambahkan user baru dan tutor baru dalam satu transaksi
     const newUser = await prisma.$transaction(async (prisma) => {
@@ -100,6 +141,7 @@ const signUpTutorsHandler = async (request, h) => {
           rekening_number: rekeningNumber,
           availability,
           studied_method: studiedMethod,
+          ktp: ktpUrl, // save the KTP URL in the database
         },
       });
 

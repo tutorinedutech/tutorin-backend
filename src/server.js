@@ -6,8 +6,12 @@ const init = async () => {
     port: 5000,
     host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
     routes: {
-      cors: {
-        origin: ['*'],
+      cors: true,
+      payload: {
+        output: 'stream',
+        parse: true,
+        allow: 'multipart/form-data',
+        maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
   });

@@ -18,6 +18,14 @@ const routes = [
     method: 'POST',
     path: '/signUpTutors',
     handler: signUpTutorsHandler,
+    options: {
+      payload: {
+        output: 'stream',
+        parse: true,
+        allow: 'multipart/form-data',
+        multipart: true,
+      },
+    },
   },
   {
     method: 'POST',
