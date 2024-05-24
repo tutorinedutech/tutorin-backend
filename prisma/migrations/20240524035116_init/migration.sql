@@ -13,6 +13,7 @@ CREATE TABLE `Students` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `education_level` VARCHAR(191) NOT NULL,
+    `phone_number` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -27,6 +28,10 @@ CREATE TABLE `Tutors` (
     `languages` VARCHAR(191) NOT NULL,
     `subjects` VARCHAR(191) NOT NULL,
     `teaching_criteria` VARCHAR(191) NOT NULL,
+    `phone_number` VARCHAR(191) NOT NULL,
+    `rekening_number` VARCHAR(191) NOT NULL,
+    `availability` VARCHAR(191) NOT NULL,
+    `studied_method` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -48,7 +53,7 @@ CREATE TABLE `Transactions_in` (
     `student_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `total` DOUBLE NOT NULL,
-    `transaction_date` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -58,6 +63,8 @@ CREATE TABLE `Balances` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tutor_id` INTEGER NOT NULL,
     `total` DOUBLE NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -68,7 +75,7 @@ CREATE TABLE `Transactions_out` (
     `balance_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `total` DOUBLE NOT NULL,
-    `transaction_date` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -79,7 +86,7 @@ CREATE TABLE `Messages` (
     `sender_id` INTEGER NOT NULL,
     `receiver_id` INTEGER NOT NULL,
     `message` VARCHAR(191) NOT NULL,
-    `sent_at` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -91,8 +98,8 @@ CREATE TABLE `Reviews` (
     `tutor_id` INTEGER NOT NULL,
     `rating` INTEGER NOT NULL,
     `comment` VARCHAR(191) NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
