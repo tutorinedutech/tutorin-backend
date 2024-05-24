@@ -70,7 +70,7 @@ const signUpTutorsHandler = async (request, h) => {
     if (existingUser) {
       return h.response({
         status: 'error',
-        message: 'User already registered with the provided email, phone number, or username.',
+        message: 'User already registered with the provided email or username.',
       }).code(400);
     }
 
