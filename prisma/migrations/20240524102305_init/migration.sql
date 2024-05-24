@@ -9,11 +9,13 @@ CREATE TABLE `Users` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Students` (
+CREATE TABLE `Learners` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `education_level` VARCHAR(191) NOT NULL,
     `phone_number` VARCHAR(191) NOT NULL,
+    `gender` VARCHAR(191) NOT NULL,
+    `domicile` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -39,7 +41,7 @@ CREATE TABLE `Tutors` (
 -- CreateTable
 CREATE TABLE `Schedules` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `student_id` INTEGER NOT NULL,
+    `learner_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `sessions` INTEGER NOT NULL,
     `subject` VARCHAR(191) NOT NULL,
@@ -50,7 +52,7 @@ CREATE TABLE `Schedules` (
 -- CreateTable
 CREATE TABLE `Transactions_in` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `student_id` INTEGER NOT NULL,
+    `learner_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `total` DOUBLE NOT NULL,
     `created_at` DATETIME(3) NOT NULL,
@@ -94,7 +96,7 @@ CREATE TABLE `Messages` (
 -- CreateTable
 CREATE TABLE `Reviews` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `student_id` INTEGER NOT NULL,
+    `learner_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `rating` INTEGER NOT NULL,
     `comment` VARCHAR(191) NULL,
@@ -105,19 +107,19 @@ CREATE TABLE `Reviews` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Students` ADD CONSTRAINT `Students_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Learners` ADD CONSTRAINT `Learners_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Tutors` ADD CONSTRAINT `Tutors_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Schedules` ADD CONSTRAINT `Schedules_student_id_fkey` FOREIGN KEY (`student_id`) REFERENCES `Students`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Schedules` ADD CONSTRAINT `Schedules_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Schedules` ADD CONSTRAINT `Schedules_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Transactions_in` ADD CONSTRAINT `Transactions_in_student_id_fkey` FOREIGN KEY (`student_id`) REFERENCES `Students`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Transactions_in` ADD CONSTRAINT `Transactions_in_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Transactions_in` ADD CONSTRAINT `Transactions_in_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -138,7 +140,7 @@ ALTER TABLE `Messages` ADD CONSTRAINT `Messages_sender_id_fkey` FOREIGN KEY (`se
 ALTER TABLE `Messages` ADD CONSTRAINT `Messages_receiver_id_fkey` FOREIGN KEY (`receiver_id`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Reviews` ADD CONSTRAINT `Reviews_student_id_fkey` FOREIGN KEY (`student_id`) REFERENCES `Students`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Reviews` ADD CONSTRAINT `Reviews_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Reviews` ADD CONSTRAINT `Reviews_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
