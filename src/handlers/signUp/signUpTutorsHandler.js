@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-const uploadKtpToGCS = require('./uploadKtpToGCS');
-const uploadProfilePictureToGCS = require('./uploadProfilePictureToGCS')
+const { uploadKtpToGCS, uploadProfilePictureToGCS, uploadCVToGCS } = require('./uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
@@ -33,6 +32,7 @@ const signUpTutorsHandler = async (request, h) => {
     availability,
     studiedMethod,
     profilePicture,
+    cv,
   } = request.payload;
 
   // Melakukan pengecekan jika ada nilai yang kosong
@@ -82,13 +82,49 @@ const signUpTutorsHandler = async (request, h) => {
     // Upload Profile Picture to GCS
     let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
     if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
-      profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
+      try {
+        profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
     }
 
     // Upload KTP to GCS
     let ktpUrl = 'You have not upload KTP file already';
     if (ktp && ktp.hapi && ktp.hapi.filename) {
-      ktpUrl = await uploadKtpToGCS(ktp);
+      try {
+        ktpUrl = await uploadKtpToGCS(ktp);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
+    }
+
+    // Upload CV to GCS
+    let cvUrl = 'You have not uploaded a CV file yet';
+    if (cv && cv.hapi && cv.hapi.filename) {
+      try {
+        cvUrl = await uploadCVToGCS(cv);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PDF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
     }
 
     // Hashing user's password
@@ -117,8 +153,9 @@ const signUpTutorsHandler = async (request, h) => {
           rekening_number: rekeningNumber,
           availability,
           studied_method: studiedMethod,
-          ktp: ktpUrl, // save the KTP URL in the database
+          ktp: ktpUrl,
           profile_picture: profilePicUrl,
+          cv: cvUrl,
         },
       });
 
@@ -141,4 +178,5 @@ const signUpTutorsHandler = async (request, h) => {
     }).code(500);
   }
 };
+
 module.exports = signUpTutorsHandler;
