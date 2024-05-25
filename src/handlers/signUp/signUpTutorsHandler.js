@@ -1,14 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
-const { Storage } = require('@google-cloud/storage');
-const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
+const uploadKtpToGCS = require('./uploadKtpToGCS');
+const uploadProfilePictureToGCS = require('./uploadProfilePictureToGCS')
 
 const prisma = new PrismaClient();
-const storage = new Storage({
-  projectId: process.env.GOOGLE_PROJECT_ID,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
-
-const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
 // Error Handler
 const createErrorResponse = (h, message) => {
@@ -18,34 +13,6 @@ const createErrorResponse = (h, message) => {
   });
   response.code(400);
   return response;
-};
-
-// fungsi untuk upload ktp
-const uploadKtpToGCS = async (ktpFile) => {
-  try {
-    const bucket = storage.bucket(bucketName);
-    const folderName = 'arsip-ktp'; // Nama folder untuk menyimpan KTP di GCS
-    const fileName = `${folderName}/ktp_${uuidv4()}.${ktpFile.hapi.filename.split('.').pop()}`; // Generate unique filename within the folder
-    const file = bucket.file(fileName);
-
-    const stream = file.createWriteStream({
-      metadata: {
-        contentType: ktpFile.hapi.headers['content-type'],
-      },
-    });
-
-    await new Promise((resolve, reject) => {
-      stream.on('finish', resolve);
-      stream.on('error', reject);
-      ktpFile.pipe(stream);
-    });
-
-    const gcsUrl = `https://storage.googleapis.com/${bucketName}/${fileName}`;
-    return gcsUrl;
-  } catch (error) {
-    console.error('Error uploading KTP to GCS:', error);
-    throw error;
-  }
 };
 
 // Nilai yang didapat dari user
@@ -65,6 +32,7 @@ const signUpTutorsHandler = async (request, h) => {
     rekeningNumber,
     availability,
     studiedMethod,
+    profilePicture,
   } = request.payload;
 
   // Melakukan pengecekan jika ada nilai yang kosong
@@ -78,7 +46,6 @@ const signUpTutorsHandler = async (request, h) => {
     domicile,
     languages,
     teachingCriteria,
-    ktp,
     subjects,
     rekeningNumber,
     availability,
@@ -112,11 +79,20 @@ const signUpTutorsHandler = async (request, h) => {
     // Menggabungkan array languages menjadi string
     const languagesString = Array.isArray(languages) ? languages.join(', ') : '';
 
+    // Upload Profile Picture to GCS
+    let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
+    if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
+      profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
+    }
+
     // Upload KTP to GCS
-    let ktpUrl = null;
-    if (ktp) {
+    let ktpUrl = 'You have not upload KTP file already';
+    if (ktp && ktp.hapi && ktp.hapi.filename) {
       ktpUrl = await uploadKtpToGCS(ktp);
     }
+
+    // Hashing user's password
+    const hash = await bcrypt.hash(password, 10);
 
     // Menambahkan user baru dan tutor baru dalam satu transaksi
     const newUser = await prisma.$transaction(async (prisma) => {
@@ -124,7 +100,7 @@ const signUpTutorsHandler = async (request, h) => {
         data: {
           email,
           username,
-          password,
+          password: hash,
         },
       });
 
@@ -142,6 +118,7 @@ const signUpTutorsHandler = async (request, h) => {
           availability,
           studied_method: studiedMethod,
           ktp: ktpUrl, // save the KTP URL in the database
+          profile_picture: profilePicUrl,
         },
       });
 
