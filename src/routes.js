@@ -24,6 +24,7 @@ const routes = [
         parse: true,
         allow: 'multipart/form-data',
         multipart: true,
+        maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
   },
