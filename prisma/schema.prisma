@@ -52,6 +52,9 @@ model Tutors {
   rekening_number  String
   availability     String
   studied_method   String
+  ktp              String
+  profile_picture  String
+  cv               String
   user             Users     @relation(fields: [user_id], references: [id])
 
   schedules       Schedules[]
