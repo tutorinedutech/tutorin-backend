@@ -44,7 +44,7 @@ const signUpLearnersHandler = async (request, h) => {
     });
 
     if (existingUser) {
-      return createResponse(h, 400, 'fail', 'User already registered with the provided email or username.');
+      return createResponse(h, 400, 'fail', 'User already registered with the provided email or username');
     }
 
     // Hashing user's password
@@ -69,9 +69,9 @@ const signUpLearnersHandler = async (request, h) => {
       },
     });
 
-    return createResponse(h, 201, 'success', 'Learner registered successfully.', { email: user.email, username: user.username });
+    return createResponse(h, 201, 'success', 'Learner registered successfully', { email: user.email, username: user.username });
   } catch (error) {
-    return createResponse(h, 500, 'error', 'Failed to register learner due to an internal error.');
+    return createResponse(h, 500, 'error', 'Failed to register learner due to an internal error');
   }
 };
 

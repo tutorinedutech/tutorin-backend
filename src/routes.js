@@ -12,11 +12,17 @@ const routes = [
   {
     method: 'POST',
     path: '/signin',
+    options: {
+      auth: false,
+    },
     handler: signInHandler,
   },
   {
     method: 'POST',
     path: '/signuptutors',
+    options: {
+      auth: false,
+    },
     handler: signUpTutorsHandler,
     options: {
       payload: {
@@ -31,6 +37,9 @@ const routes = [
   {
     method: 'POST',
     path: '/signuplearners',
+    options: {
+      auth: false,
+    },
     handler: signUpLearnersHandler,
   },
 ];
