@@ -22,9 +22,6 @@ const routes = [
     path: '/signuptutors',
     options: {
       auth: false,
-    },
-    handler: signUpTutorsHandler,
-    options: {
       payload: {
         output: 'stream',
         parse: true,
@@ -33,6 +30,7 @@ const routes = [
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
+    handler: signUpTutorsHandler,
   },
   {
     method: 'POST',
