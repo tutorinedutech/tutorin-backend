@@ -1,4 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
+const { uploadKtpToGCS, uploadProfilePictureToGCS, uploadCVToGCS } = require('./uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
@@ -29,6 +31,8 @@ const signUpTutorsHandler = async (request, h) => {
     rekeningNumber,
     availability,
     studiedMethod,
+    profilePicture,
+    cv,
   } = request.payload;
 
   // Melakukan pengecekan jika ada nilai yang kosong
@@ -42,7 +46,6 @@ const signUpTutorsHandler = async (request, h) => {
     domicile,
     languages,
     teachingCriteria,
-    ktp,
     subjects,
     rekeningNumber,
     availability,
@@ -69,12 +72,63 @@ const signUpTutorsHandler = async (request, h) => {
     if (existingUser) {
       return h.response({
         status: 'error',
-        message: 'User already registered with the provided email or username.',
+        message: 'User already registered with the provided email, phone number, or username.',
       }).code(400);
     }
 
     // Menggabungkan array languages menjadi string
-    const languagesString = languages.join(', ');
+    const languagesString = Array.isArray(languages) ? languages.join(', ') : '';
+
+    // Upload Profile Picture to GCS
+    let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
+    if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
+      try {
+        profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
+    }
+
+    // Upload KTP to GCS
+    let ktpUrl = 'You have not upload KTP file already';
+    if (ktp && ktp.hapi && ktp.hapi.filename) {
+      try {
+        ktpUrl = await uploadKtpToGCS(ktp);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
+    }
+
+    // Upload CV to GCS
+    let cvUrl = 'You have not uploaded a CV file yet';
+    if (cv && cv.hapi && cv.hapi.filename) {
+      try {
+        cvUrl = await uploadCVToGCS(cv);
+      } catch (error) {
+        if (error.message === 'Invalid file type. Only PDF files are allowed.') {
+          return h.response({
+            status: 'fail',
+            message: error.message,
+          }).code(error.code || 400);
+        }
+        throw error;
+      }
+    }
+
+    // Hashing user's password
+    const hash = await bcrypt.hash(password, 10);
 
     // Menambahkan user baru dan tutor baru dalam satu transaksi
     const newUser = await prisma.$transaction(async (prisma) => {
@@ -82,7 +136,7 @@ const signUpTutorsHandler = async (request, h) => {
         data: {
           email,
           username,
-          password,
+          password: hash,
         },
       });
 
@@ -99,6 +153,9 @@ const signUpTutorsHandler = async (request, h) => {
           rekening_number: rekeningNumber,
           availability,
           studied_method: studiedMethod,
+          ktp: ktpUrl,
+          profile_picture: profilePicUrl,
+          cv: cvUrl,
         },
       });
 

@@ -24,6 +24,15 @@ const routes = [
       auth: false,
     },
     handler: signUpTutorsHandler,
+    options: {
+      payload: {
+        output: 'stream',
+        parse: true,
+        allow: 'multipart/form-data',
+        multipart: true,
+        maxBytes: 2 * 1024 * 1024, // 2 MB limit
+      },
+    },
   },
   {
     method: 'POST',
