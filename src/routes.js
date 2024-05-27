@@ -1,4 +1,12 @@
-const { signInHandler, signUpTutorsHandler, signUpLearnersHandler } = require('./handlers/mainHandler');
+const {
+  signInHandler,
+  signUpTutorsHandler,
+  signUpLearnersHandler,
+  allTutors,
+  idTutors,
+  allLearners,
+  idLearners,
+} = require('./handlers/mainHandler');
 
 const routes = [
   {
@@ -39,6 +47,38 @@ const routes = [
       auth: false,
     },
     handler: signUpLearnersHandler,
+  },
+  {
+    method: 'GET',
+    path: '/tutors',
+    options: {
+      auth: false,
+    },
+    handler: allTutors,
+  },
+  {
+    method: 'GET',
+    path: '/tutors/{id}',
+    options: {
+      auth: false,
+    },
+    handler: idTutors,
+  },
+  {
+    method: 'GET',
+    path: '/learners',
+    options: {
+      auth: false,
+    },
+    handler: allLearners,
+  },
+  {
+    method: 'GET',
+    path: '/learners/{id}',
+    options: {
+      auth: false,
+    },
+    handler: idLearners,
   },
 ];
 
