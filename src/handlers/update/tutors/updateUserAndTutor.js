@@ -4,7 +4,7 @@ const {
   uploadKtpToGCS,
   uploadProfilePictureToGCS,
   uploadCVToGCS,
-} = require('../../../signUp/uploadFileToGCS');
+} = require('../../signUp/uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
