@@ -2,12 +2,12 @@ const signInHandler = require('./signIn/signInHandler');
 const signUpTutorsHandler = require('./signUp/signUpTutorsHandler');
 const signUpLearnersHandler = require('./signUp/signUpLearnersHandler');
 const signOutHandler = require('./signOut/signOutHandler');
-const allTutors = require('./tutorsData/allTutors');
-const idTutors = require('./tutorsData/idTutors');
-const allLearners = require('./learnersData/allLearners');
-const idLearners = require('./learnersData/idLearners');
-const updateUserAndLearner = require('./update/learners/updateUserAndLearner');
-const updateUserAndTutor = require('./update/tutors/updateUserAndTutor');
+const allTutors = require('./tutorsData/allTutorsHandler');
+const idTutors = require('./tutorsData/idTutorsHandler');
+const allLearners = require('./learnersData/allLearnersHandler');
+const idLearners = require('./learnersData/idLearnersHandler');
+const updateUserAndLearner = require('./updateTutorsAndLearners/learners/updateUserAndLearnerHandler');
+const updateUserAndTutor = require('./updateTutorsAndLearners/tutors/updateUserAndTutorHandler');
 
 module.exports = {
   signInHandler,

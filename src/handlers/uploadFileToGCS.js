@@ -9,7 +9,7 @@ const storage = new Storage({
 const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
 // fungsi untuk upload ktp
-const uploadKtpToGCS = async (ktpFile) => {
+const uploadKtp = async (ktpFile) => {
   try {
     // Pastikan file adalah PNG, JPG, atau GIF
     const validTypes = ['image/png', 'image/jpeg', 'image/gif'];
@@ -49,7 +49,7 @@ const uploadKtpToGCS = async (ktpFile) => {
 };
 
 // fungsi untuk upload ktp
-const uploadProfilePictureToGCS = async (profilePictureFile) => {
+const uploadProfilePicture = async (profilePictureFile) => {
   try {
     // Pastikan file adalah PNG, JPG, atau GIF
     const validTypes = ['image/png', 'image/jpeg', 'image/gif'];
@@ -88,7 +88,7 @@ const uploadProfilePictureToGCS = async (profilePictureFile) => {
 };
 
 // Fungsi untuk mengunggah CV
-const uploadCVToGCS = async (cvFile) => {
+const uploadCv = async (cvFile) => {
   try {
     // Pastikan file adalah PDF
     const isPDF = cvFile.hapi.headers['content-type'] === 'application/pdf';
@@ -125,4 +125,8 @@ const uploadCVToGCS = async (cvFile) => {
   }
 };
 
-module.exports = { uploadKtpToGCS, uploadProfilePictureToGCS, uploadCVToGCS };
+module.exports = {
+  uploadKtp,
+  uploadProfilePicture,
+  uploadCv,
+};

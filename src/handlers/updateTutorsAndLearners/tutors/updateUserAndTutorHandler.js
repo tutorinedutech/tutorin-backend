@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcrypt');
 const {
-  uploadKtpToGCS,
-  uploadProfilePictureToGCS,
-  uploadCVToGCS,
-} = require('../../signUp/uploadFileToGCS');
+  uploadKtp,
+  uploadProfilePicture,
+  uploadCv,
+} = require('../../uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
@@ -64,55 +64,44 @@ const updateUserAndTutor = async (request, h) => {
     }
 
     // Upload file ke Google Cloud Storage dan dapatkan URLnya
-    // const ktpUrl = ktp ? await uploadFile(ktp, 'arsip-ktp', 'ktp') : null;
-    // const profilePictureUrl = profilePicture ? await uploadFile(profilePicture, 'arsip-profile-picture', 'profile-picture') : null;
-    // const cvUrl = cv ? await uploadFile(cv, 'arsip-cv', 'cv') : null;
+    let ktpUrl = null;
+    if (ktp) {
+      ktpUrl = await uploadKtp(ktp);
+    } else {
+      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
+      const tutor = await prisma.tutors.findFirst({
+        where: { user_id: parseInt(id) },
+      });
+      if (tutor) {
+        ktpUrl = tutor.ktp; // Gunakan nilai KTP yang sudah ada di database
+      }
+    }
 
-    // Upload Profile Picture to GCS
-    // let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
-    // if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
-    //   try {
-    //     profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
-    //   } catch (error) {
-    //     if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
-    //       return h.response({
-    //         status: 'fail',
-    //         message: error.message,
-    //       }).code(error.code || 400);
-    //     }
-    //     throw error;
-    //   }
-    // }
+    // Upload file profilepicture Google Cloud Storage dan dapatkan URLnya
+    let profilePictureUrl = null;
+    if (profilePicture) {
+      profilePictureUrl = await uploadProfilePicture(profilePicture);
+    } else {
+      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
+      const tutor = await prisma.tutors.findFirst({
+        where: { user_id: parseInt(id) },
+      });
+      if (tutor) {
+        profilePictureUrl = tutor.profile_picture; // Gunakan nilai KTP yang sudah ada di database
+      }
+    }
 
-    // // Upload KTP to GCS
-    // let ktpUrl = 'You have not upload KTP file already';
-    // if (ktp && ktp.hapi && ktp.hapi.filename) {
-    //   try {
-    //     ktpUrl = await uploadKtpToGCS(ktp);
-    //   } catch (error) {
-    //     if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
-    //       return h.response({
-    //         status: 'fail',
-    //         message: error.message,
-    //       }).code(error.code || 400);
-    //     }
-    //     throw error;
-    //   }
-    // }
-
-    // Upload CV to GCS
-    let cvUrl = 'You have not uploaded a CV file yet';
-    if (cv && cv.hapi && cv.hapi.filename) {
-      try {
-        cvUrl = await uploadCVToGCS(cv);
-      } catch (error) {
-        if (error.message === 'Invalid file type. Only PDF files are allowed.') {
-          return h.response({
-            status: 'fail',
-            message: error.message,
-          }).code(error.code || 400);
-        }
-        throw error;
+    // Upload file CV Google Cloud Storage dan dapatkan URLnya
+    let cvUrl = null;
+    if (cv) {
+      cvUrl = await uploadCv(cv);
+    } else {
+      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
+      const tutor = await prisma.tutors.findFirst({
+        where: { user_id: parseInt(id) },
+      });
+      if (tutor) {
+        cvUrl = tutor.cv; // Gunakan nilai KTP yang sudah ada di database
       }
     }
 
@@ -146,12 +135,12 @@ const updateUserAndTutor = async (request, h) => {
           rekening_number: rekeningNumber,
           availability,
           studied_method: studiedMethod,
-          //   ktp: ktpUrl,
-          //   profile_picture: profilePicUrl,
-          //   cv: cvUrl,
-          // ...(ktpUrl && { ktp: ktpUrl }),
-          //   ...(profilePictureUrl && { profile_picture: profilePictureUrl }),
-          //   ...(cvUrl && { cv: cvUrl }),
+          // ktp: ktpUrl,
+          // profile_picture: profilePicUrl,
+          // cv: cvUrl,
+          ...(ktpUrl && { ktp: ktpUrl }),
+          ...(profilePictureUrl && { profile_picture: profilePictureUrl }),
+          ...(cvUrl && { cv: cvUrl }),
 
         },
       });

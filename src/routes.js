@@ -107,8 +107,8 @@ const routes = [
           domicile: Joi.string().optional(),
         }),
       },
-      handler: updateUserAndLearner,
     },
+    handler: updateUserAndLearner,
   },
   {
     method: 'PUT',
@@ -121,28 +121,6 @@ const routes = [
         allow: 'multipart/form-data',
         multipart: true,
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
-      },
-      validate: {
-        params: Joi.object({
-          id: Joi.number().integer().required(),
-        }),
-        payload: Joi.object({
-          email: Joi.string().email().optional(),
-          username: Joi.string().optional(),
-          password: Joi.string().optional(),
-          educationLevel: Joi.string().optional(),
-          phoneNumber: Joi.string().optional(),
-          domicile: Joi.string().optional(),
-          languages: Joi.string().optional(),
-          subjects: Joi.string().optional(),
-          teachingCriteria: Joi.string().optional(),
-          rekeningNumber: Joi.string().optional(),
-          availability: Joi.string().optional(),
-          studiedMethod: Joi.string().optional(),
-          profile_picture: Joi.any().optional(),
-          cv: Joi.any().optional(),
-          ktp: Joi.any().optional(),
-        }),
       },
     },
     handler: updateUserAndTutor,

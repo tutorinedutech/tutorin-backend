@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-const { uploadKtpToGCS, uploadProfilePictureToGCS, uploadCVToGCS } = require('./uploadFileToGCS');
+const { uploadKtp,
+  uploadProfilePicture,
+  uploadCv, } = require('../uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
@@ -83,7 +85,7 @@ const signUpTutorsHandler = async (request, h) => {
     let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
     if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
       try {
-        profilePicUrl = await uploadProfilePictureToGCS(profilePicture);
+        profilePicUrl = await uploadProfilePicture(profilePicture);
       } catch (error) {
         if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
           return h.response({
@@ -99,7 +101,7 @@ const signUpTutorsHandler = async (request, h) => {
     let ktpUrl = 'You have not upload KTP file already';
     if (ktp && ktp.hapi && ktp.hapi.filename) {
       try {
-        ktpUrl = await uploadKtpToGCS(ktp);
+        ktpUrl = await uploadKtp(ktp);
       } catch (error) {
         if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
           return h.response({
@@ -115,7 +117,7 @@ const signUpTutorsHandler = async (request, h) => {
     let cvUrl = 'You have not uploaded a CV file yet';
     if (cv && cv.hapi && cv.hapi.filename) {
       try {
-        cvUrl = await uploadCVToGCS(cv);
+        cvUrl = await uploadCv(cv);
       } catch (error) {
         if (error.message === 'Invalid file type. Only PDF files are allowed.') {
           return h.response({
