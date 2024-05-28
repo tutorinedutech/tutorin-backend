@@ -1,4 +1,4 @@
 node_modules/
 # Keep environment variables out of version control
 .env
-serviceaccountkey.json
+tutorin-424608-d350fc954c45.json

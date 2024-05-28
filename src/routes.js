@@ -1,4 +1,6 @@
-const { signInHandler, signUpTutorsHandler, signUpLearnersHandler } = require('./handlers/mainHandler');
+const {
+  signInHandler, signUpTutorsHandler, signUpLearnersHandler, signOutHandler,
+} = require('./handlers/mainHandler');
 
 const routes = [
   {
@@ -16,6 +18,11 @@ const routes = [
       auth: false,
     },
     handler: signInHandler,
+  },
+  {
+    method: 'POST',
+    path: '/signout',
+    handler: signOutHandler,
   },
   {
     method: 'POST',
