@@ -1,8 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-const { uploadKtp,
+const {
+  uploadKtp,
   uploadProfilePicture,
-  uploadCv, } = require('../uploadFileToGCS');
+  uploadCv,
+} = require('../uploadFileToGCS');
 
 const prisma = new PrismaClient();
 
