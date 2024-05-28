@@ -14,25 +14,31 @@ datasource db {
 }
 
 model Users {
-  id       Int       @id @default(autoincrement())
-  email    String
-  username String
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  username String @unique
   password String
 
-  learners Learners[]
-  tutors   Tutors[]
-  sentMessages    Messages[] @relation("Sender")
+  learners         Learners[]
+  tutors           Tutors[]
+  sentMessages     Messages[] @relation("Sender")
   receivedMessages Messages[] @relation("Receiver")
 }
 
+model Blacklist_token {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+}
+
 model Learners {
-  id              Int      @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   user_id         Int
   education_level String
-  phone_number String
+  phone_number    String
   gender          String
   domicile        String
-  user            Users    @relation(fields: [user_id], references: [id])
+  user            Users  @relation(fields: [user_id], references: [id])
 
   schedules      Schedules[]
   transactionsIn Transactions_in[]
@@ -40,22 +46,22 @@ model Learners {
 }
 
 model Tutors {
-  id               Int       @id @default(autoincrement())
-  user_id          Int
-  education_level  String
-  gender           String
-  domicile         String
-  languages        String
-  subjects         String
+  id                Int    @id @default(autoincrement())
+  user_id           Int
+  education_level   String
+  gender            String
+  domicile          String
+  languages         String
+  subjects          String
   teaching_criteria String
   phone_number      String
-  rekening_number  String
-  availability     String
-  studied_method   String
-  ktp              String
-  profile_picture  String
-  cv               String
-  user             Users     @relation(fields: [user_id], references: [id])
+  rekening_number   String
+  availability      String
+  studied_method    String
+  ktp               String
+  profile_picture   String
+  cv                String
+  user              Users  @relation(fields: [user_id], references: [id])
 
   schedules       Schedules[]
   balances        Balances[]
@@ -65,7 +71,7 @@ model Tutors {
 }
 
 model Schedules {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   learner_id Int
   tutor_id   Int
   sessions   Int
@@ -75,53 +81,53 @@ model Schedules {
 }
 
 model Transactions_in {
-  id               Int       @id @default(autoincrement())
-  learner_id       Int
-  tutor_id         Int
-  total            Float
-  created_at       DateTime
-  learner          Learners   @relation(fields: [learner_id], references: [id])
-  tutor            Tutors     @relation(fields: [tutor_id], references: [id])
+  id         Int      @id @default(autoincrement())
+  learner_id Int
+  tutor_id   Int
+  total      Float
+  created_at DateTime
+  learner    Learners @relation(fields: [learner_id], references: [id])
+  tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
 
 model Balances {
-  id        Int       @id @default(autoincrement())
-  tutor_id  Int
-  total     Float
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  tutor     Tutors    @relation(fields: [tutor_id], references: [id])
+  id              Int                @id @default(autoincrement())
+  tutor_id        Int
+  total           Float
+  created_at      DateTime           @default(now())
+  updated_at      DateTime           @updatedAt
+  tutor           Tutors             @relation(fields: [tutor_id], references: [id])
   transactionsOut Transactions_out[]
 }
 
 model Transactions_out {
-  id               Int       @id @default(autoincrement())
-  balance_id       Int
-  tutor_id         Int
-  total            Float
-  created_at       DateTime
-  balance          Balances  @relation(fields: [balance_id], references: [id])
-  tutor            Tutors    @relation(fields: [tutor_id], references: [id])
+  id         Int      @id @default(autoincrement())
+  balance_id Int
+  tutor_id   Int
+  total      Float
+  created_at DateTime
+  balance    Balances @relation(fields: [balance_id], references: [id])
+  tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
 
 model Messages {
-  id         Int       @id @default(autoincrement())
-  sender_id  Int
+  id          Int      @id @default(autoincrement())
+  sender_id   Int
   receiver_id Int
-  message    String
-  created_at DateTime
-  sender     Users     @relation("Sender", fields: [sender_id], references: [id])
-  receiver   Users     @relation("Receiver", fields: [receiver_id], references: [id])
+  message     String
+  created_at  DateTime
+  sender      Users    @relation("Sender", fields: [sender_id], references: [id])
+  receiver    Users    @relation("Receiver", fields: [receiver_id], references: [id])
 }
 
 model Reviews {
-  id        Int      @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   learner_id Int
   tutor_id   Int
-  rating    Int
-  comment   String?
+  rating     Int
+  comment    String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  learner   Learners @relation(fields: [learner_id], references: [id])
-  tutor     Tutors   @relation(fields: [tutor_id], references: [id])
+  learner    Learners @relation(fields: [learner_id], references: [id])
+  tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }

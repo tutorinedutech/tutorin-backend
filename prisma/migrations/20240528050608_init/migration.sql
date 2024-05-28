@@ -5,6 +5,18 @@ CREATE TABLE `Users` (
     `username` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
 
+    UNIQUE INDEX `Users_email_key`(`email`),
+    UNIQUE INDEX `Users_username_key`(`username`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Blacklist_token` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `Blacklist_token_token_key`(`token`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -34,6 +46,9 @@ CREATE TABLE `Tutors` (
     `rekening_number` VARCHAR(191) NOT NULL,
     `availability` VARCHAR(191) NOT NULL,
     `studied_method` VARCHAR(191) NOT NULL,
+    `ktp` VARCHAR(191) NOT NULL,
+    `profile_picture` VARCHAR(191) NOT NULL,
+    `cv` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

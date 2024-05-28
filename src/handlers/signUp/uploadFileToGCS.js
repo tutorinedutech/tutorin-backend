@@ -24,7 +24,7 @@ const uploadKtpToGCS = async (ktpFile) => {
     }
 
     const bucket = storage.bucket(bucketName);
-    const folderName = 'arsip-ktp'; // Nama folder untuk menyimpan KTP di GCS
+    const folderName = 'ktp'; // Nama folder untuk menyimpan KTP di GCS
     const fileName = `${folderName}/ktp_${uuidv4()}.${ktpFile.hapi.filename.split('.').pop()}`; // Generate unique filename within the folder
     const file = bucket.file(fileName);
 
@@ -63,7 +63,7 @@ const uploadProfilePictureToGCS = async (profilePictureFile) => {
       throw error;
     }
     const bucket = storage.bucket(bucketName);
-    const folderName = 'arsip-profile-picture'; // Nama folder untuk menyimpan KTP di GCS
+    const folderName = 'profile-picture'; // Nama folder untuk menyimpan KTP di GCS
     const fileName = `${folderName}/profile-picture_${uuidv4()}.${profilePictureFile.hapi.filename.split('.').pop()}`; // Generate unique filename within the folder
     const file = bucket.file(fileName);
 
@@ -101,7 +101,7 @@ const uploadCVToGCS = async (cvFile) => {
     }
 
     const bucket = storage.bucket(bucketName);
-    const folderName = 'arsip-cv'; // Nama folder untuk menyimpan CV di GCS
+    const folderName = 'cv'; // Nama folder untuk menyimpan CV di GCS
     const fileName = `${folderName}/cv_${uuidv4()}.pdf`; // Generate unique filename within the folder
     const file = bucket.file(fileName);
 
