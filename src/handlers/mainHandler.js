@@ -5,6 +5,8 @@ const allTutors = require('./tutorsData/allTutors');
 const idTutors = require('./tutorsData/idTutors');
 const allLearners = require('./learnersData/allLearners');
 const idLearners = require('./learnersData/idLearners');
+const updateUserAndLearner = require('./update/learners/updateUserAndLearner');
+const updateUserAndTutor = require('./update/tutors/updateUserAndTutor');
 
 module.exports = {
   signInHandler,
@@ -14,4 +16,6 @@ module.exports = {
   idTutors,
   allLearners,
   idLearners,
+  updateUserAndLearner,
+  updateUserAndTutor,
 };
