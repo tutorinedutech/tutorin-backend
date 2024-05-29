@@ -29,8 +29,31 @@ const signInHandler = async (request, h) => {
     return createResponse(h, 401, 'fail', 'Invalid username or password');
   }
 
-  const token = JWT.sign({ id: user.id, username: user.username }, secret, { algorithm: 'HS256', expiresIn: '1d' });
-  return createResponse(h, 200, 'success', 'User has successfully logged in', { id: user.id, username: user.username, token });
+  const tutor = await prisma.tutors.findFirst({
+    where: { user_id: parseInt(user.id) },
+  });
+
+  if (tutor) {
+    const token = JWT.sign({ id: user.id, tutorId: tutor.id, username: user.username }, secret, { algorithm: 'HS256', expiresIn: '1d' });
+    return createResponse(h, 200, 'success', 'User has successfully logged in', {
+      id: user.id,
+      tutorId: tutor.id,
+      username: user.username,
+      token
+    });
+  }
+
+  const learner = await prisma.learners.findUnique({
+    where: { user_id: parseInt(user.id) },
+  });
+
+  const token = JWT.sign({ id: user.id, learnerId: learner.id, username: user.username }, secret, { algorithm: 'HS256', expiresIn: '1d' });
+  return createResponse(h, 200, 'success', 'User has successfully logged in', {
+    id: user.id,
+    learnerId: learner.id,
+    username: user.username,
+    token
+  });
 };
 
 module.exports = signInHandler;
