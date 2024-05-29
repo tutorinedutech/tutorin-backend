@@ -8,7 +8,7 @@ const signOutHandler = async (request, h) => {
   await prisma.blacklist_token.create({
     data: { token },
   });
-return createResponse(h, 200, 'success', 'User has successfully logged out')
+  return createResponse(h, 200, 'success', 'User has successfully logged out');
 };
 
 module.exports = signOutHandler;
