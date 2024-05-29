@@ -5,6 +5,7 @@ const {
   uploadProfilePicture,
   uploadCv,
 } = require('../uploadFileToGCS');
+const createResponse = require('../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -166,20 +167,13 @@ const signUpTutorsHandler = async (request, h) => {
       return { createdUser, createdTutor };
     });
 
-    return h.response({
-      status: 'success',
-      message: 'Tutor registered successfully.',
-      data: {
-        tutorEmail: newUser.createdUser.email,
-        username: newUser.createdUser.username,
-      },
-    }).code(201);
+    return createResponse(h, 201, 'success', 'Tutor registered successfully', {
+      tutorEmail: newUser.createdUser.email,
+      username: newUser.createdUser.username,
+    });
   } catch (error) {
     console.error(error);
-    return h.response({
-      status: 'error',
-      message: 'Failed to register tutor due to an internal error.',
-    }).code(500);
+    return createResponse(h, 500, 'error', 'ailed to register tutor due to an internal error');
   }
 };
 

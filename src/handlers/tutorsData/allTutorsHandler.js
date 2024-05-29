@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const createResponse = require('../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -20,16 +21,10 @@ const allTutors = async (request, h) => {
       subjects: tutor.subjects,
     }));
 
-    return h.response({
-      status: 'Success',
-      data: result,
-    }).code(200);
+    return createResponse(h, 200, 'success', 'All data Tutors retrieved successfully', result);
   } catch (error) {
     console.error('Error fetching tutors:', error);
-    return h.response({
-      status: 'Error',
-      message: 'Failed to fetch tutors',
-    }).code(500);
+    return createResponse(h, 500, 'error', 'Data tutors cannot retrieved successfully, Failed to fetch tutors');
   }
 };
 

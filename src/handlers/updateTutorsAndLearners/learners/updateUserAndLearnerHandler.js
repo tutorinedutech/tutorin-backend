@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcrypt');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -75,19 +76,11 @@ const updateUserAndLearner = async (request, h) => {
     }
 
     // Tanggapi dengan data yang diperbarui
-    return h.response({
-      status: 'Success',
-      message: 'User and learner data updated successfully',
-      data: { updatedUser, updatedLearner },
-    }).code(200);
+    return createResponse(h, 200, 'success', 'User and learner data updated successfully', { updatedUser, updatedLearner });
   } catch (error) {
     // Tangani kesalahan
     console.error('Error updating user and learner data:', error);
-    return h.response({
-      status: 'error',
-      message: 'Internal Server Error',
-      data: {},
-    }).code(500);
+    return createResponse(h, 500, 'error', 'User and learner data cannot updated, Internal Server Error');
   }
 };
 

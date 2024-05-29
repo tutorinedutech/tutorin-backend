@@ -5,6 +5,7 @@ const {
   uploadProfilePicture,
   uploadCv,
 } = require('../../uploadFileToGCS');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -135,9 +136,6 @@ const updateUserAndTutor = async (request, h) => {
           rekening_number: rekeningNumber,
           availability,
           studied_method: studiedMethod,
-          // ktp: ktpUrl,
-          // profile_picture: profilePicUrl,
-          // cv: cvUrl,
           ...(ktpUrl && { ktp: ktpUrl }),
           ...(profilePictureUrl && { profile_picture: profilePictureUrl }),
           ...(cvUrl && { cv: cvUrl }),
@@ -147,19 +145,11 @@ const updateUserAndTutor = async (request, h) => {
     }
 
     // Tanggapi dengan data yang diperbarui
-    return h.response({
-      status: 'Success',
-      message: 'User and tutor data updated successfully',
-      data: { updatedUser, updatedTutor },
-    }).code(200);
+    return createResponse(h, 200, 'success', 'User and tutor data updated successfully', { updatedUser, updatedTutor });
   } catch (error) {
     // Tangani kesalahan
     console.error('Error updating user and tutor data:', error);
-    return h.response({
-      status: 'error',
-      message: 'Internal Server Error',
-      data: {},
-    }).code(500);
+    return createResponse(h, 500, 'error', 'User and tutor data cannot updated, Internal Server Error');
   }
 };
 

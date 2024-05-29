@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const createResponse = require('../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -27,19 +28,11 @@ const idTutors = async (request, h) => {
       },
     });
       // Kirim respons dengan data tutor
-    return h.response({
-      status: 'Success',
-      message: 'Data tutor retrieved successfully',
-      data: user,
-    }).code(200);
+    return createResponse(h, 200, 'success', 'Data Tutors retrieved successfully', user);
   } catch (error) {
     // Tangani kesalahan
     console.error('Error fetching tutor data:', error);
-    return h.response({
-      status: 'error',
-      message: 'Internal Server Error',
-      data: {},
-    }).code(500);
+    return createResponse(h, 500, 'error', 'Data tutors cannot retrieved successfully, Internal Server Error');
   }
 };
 
