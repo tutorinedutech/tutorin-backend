@@ -1,4 +1,5 @@
 const Joi = require('joi');
+
 const {
   signInHandler,
   signUpTutorsHandler,
@@ -10,6 +11,7 @@ const {
   updateUserAndLearner,
   updateUserAndTutor,
   signOutHandler,
+  deleteFileTutorHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -60,40 +62,27 @@ const routes = [
   {
     method: 'GET',
     path: '/tutors',
-    options: {
-      auth: false,
-    },
     handler: allTutors,
   },
   {
     method: 'GET',
     path: '/tutors/{id}',
-    options: {
-      auth: false,
-    },
     handler: idTutors,
   },
   {
     method: 'GET',
     path: '/learners',
-    options: {
-      auth: false,
-    },
     handler: allLearners,
   },
   {
     method: 'GET',
     path: '/learners/{id}',
-    options: {
-      auth: false,
-    },
     handler: idLearners,
   },
   {
     method: 'PUT',
     path: '/learners/{id}',
     options: {
-      auth: false,
       validate: {
         params: Joi.object({
           id: Joi.number().integer().required(),
@@ -114,7 +103,6 @@ const routes = [
     method: 'PUT',
     path: '/tutors/{id}',
     options: {
-      auth: false,
       payload: {
         output: 'stream',
         parse: true,
@@ -125,5 +113,11 @@ const routes = [
     },
     handler: updateUserAndTutor,
   },
+  {
+    method: 'DELETE',
+    path: '/tutors/{tutorId}',
+    handler: deleteFileTutorHandler,
+  },
 ];
+
 module.exports = routes;
