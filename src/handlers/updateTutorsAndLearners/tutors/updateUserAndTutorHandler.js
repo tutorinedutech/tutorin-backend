@@ -29,10 +29,31 @@ const updateUserAndTutor = async (request, h) => {
     cv,
   } = request.payload;
   try {
+    // Ambil data user dari database untuk mendapatkan nilai saat ini
+    const currentUser = await prisma.users.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!currentUser) {
+      return h.response({
+        status: 'fail',
+        message: 'User not found',
+      }).code(404);
+    }
+
+    // Ambil data tutor dari database untuk mendapatkan nilai saat ini
+    const currentTutor = await prisma.tutors.findFirst({
+      where: { user_id: parseInt(id) },
+    });
+
+    // Gunakan nilai yang ada jika email atau username tidak diberikan
+    const newEmail = email || currentUser.email;
+    const newUsername = username || currentUser.username;
+
     // Periksa apakah email atau username sudah ada di database selain dari user yang sedang diupdate
     const emailExists = await prisma.users.findFirst({
       where: {
-        email,
+        email: newEmail,
         id: { not: parseInt(id) },
       },
     });
@@ -46,7 +67,7 @@ const updateUserAndTutor = async (request, h) => {
 
     const usernameExists = await prisma.users.findFirst({
       where: {
-        username,
+        username: newUsername,
         id: { not: parseInt(id) },
       },
     });

@@ -39,7 +39,7 @@ const signInHandler = async (request, h) => {
       id: user.id,
       tutorId: tutor.id,
       username: user.username,
-      token
+      token,
     });
   }
 
@@ -52,7 +52,7 @@ const signInHandler = async (request, h) => {
     id: user.id,
     learnerId: learner.id,
     username: user.username,
-    token
+    token,
   });
 };
 

@@ -7,14 +7,40 @@ const prisma = new PrismaClient();
 const updateUserAndLearner = async (request, h) => {
   const { id } = request.params;
   const {
-    email, username, password, educationLevel, phoneNumber, domicile,
+    email,
+    username,
+    password,
+    educationLevel,
+    phoneNumber,
+    domicile,
   } = request.payload;
 
   try {
+    // Ambil data user dari database untuk mendapatkan nilai saat ini
+    const currentUser = await prisma.users.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!currentUser) {
+      return h.response({
+        status: 'fail',
+        message: 'User not found',
+      }).code(404);
+    }
+
+    // Ambil data learner dari database untuk mendapatkan nilai saat ini
+    const currentLearner = await prisma.learners.findFirst({
+      where: { user_id: parseInt(id) },
+    });
+
+    // Gunakan nilai yang ada jika email atau username tidak diberikan
+    const newEmail = email || currentUser.email;
+    const newUsername = username || currentUser.username;
+
     // Periksa apakah email atau username sudah ada di database selain dari user yang sedang diupdate
     const emailExists = await prisma.users.findFirst({
       where: {
-        email,
+        email: newEmail,
         id: { not: parseInt(id) },
       },
     });
@@ -28,7 +54,7 @@ const updateUserAndLearner = async (request, h) => {
 
     const usernameExists = await prisma.users.findFirst({
       where: {
-        username,
+        username: newUsername,
         id: { not: parseInt(id) },
       },
     });
@@ -50,27 +76,22 @@ const updateUserAndLearner = async (request, h) => {
     const updatedUser = await prisma.users.update({
       where: { id: parseInt(id) },
       data: {
-        email,
-        username,
+        email: newEmail,
+        username: newUsername,
         // Jika password ada, masukkan hashedPassword
         ...(hashedPassword && { password: hashedPassword }),
       },
     });
 
-    // Cari baris dalam tabel learners berdasaarkan user_id menggunakan findFirst
-    const learner = await prisma.learners.findFirst({
-      where: { user_id: parseInt(id) },
-    });
-
     // Jika baris dalam tabel learners ditemukan, perbarui
     let updatedLearner = null;
-    if (learner) {
+    if (currentLearner) {
       updatedLearner = await prisma.learners.update({
-        where: { id: learner.id }, // Gunakan id unik dari tabel learners
+        where: { id: currentLearner.id }, // Gunakan id unik dari tabel learners
         data: {
-          education_level: educationLevel,
-          phone_number: phoneNumber,
-          domicile,
+          education_level: educationLevel || currentLearner.education_level,
+          phone_number: phoneNumber || currentLearner.phone_number,
+          domicile: domicile || currentLearner.domicile,
         },
       });
     }
@@ -80,7 +101,7 @@ const updateUserAndLearner = async (request, h) => {
   } catch (error) {
     // Tangani kesalahan
     console.error('Error updating user and learner data:', error);
-    return createResponse(h, 500, 'error', 'User and learner data cannot updated, Internal Server Error');
+    return createResponse(h, 500, 'error', 'User and learner data cannot be updated, Internal Server Error');
   }
 };
 
