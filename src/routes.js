@@ -83,6 +83,13 @@ const routes = [
     method: 'PUT',
     path: '/learners/{id}',
     options: {
+      payload: {
+        output: 'stream',
+        parse: true,
+        allow: 'multipart/form-data',
+        multipart: true,
+        maxBytes: 2 * 1024 * 1024, // 2 MB limit
+      },
       validate: {
         params: Joi.object({
           id: Joi.number().integer().required(),
