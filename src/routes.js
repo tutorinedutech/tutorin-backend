@@ -125,6 +125,16 @@ const routes = [
     path: '/tutors/{tutorId}',
     handler: deleteFileTutorHandler,
   },
+  {
+    method: 'POST',
+    path: '/transactions',
+    handler: () => 'Transactions',
+  },
+  {
+    method: 'POST',
+    path: '/payment-status',
+    handler: () => 'payment-status',
+  },
 ];
 
 module.exports = routes;
