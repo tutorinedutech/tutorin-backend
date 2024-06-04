@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
-const createResponse = require('../createResponse');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -59,7 +59,7 @@ const signUpLearnersHandler = async (request, h) => {
       },
     });
 
-    const learner = await prisma.learners.create({
+    await prisma.learners.create({
       data: {
         user_id: user.id,
         education_level: educationLevel,

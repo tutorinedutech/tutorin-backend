@@ -4,22 +4,33 @@ const {
   uploadKtp,
   uploadProfilePicture,
   uploadCv,
-} = require('../uploadFileToGCS');
-const createResponse = require('../createResponse');
+} = require('../../uploadFileToGCS');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-// Error Handler
-const createErrorResponse = (h, message) => {
-  const response = h.response({
-    status: 'fail',
-    message,
-  });
-  response.code(400);
-  return response;
+// Fungsi untuk memvalidasi field yang diperlukan
+const validateFields = (fields) => {
+  for (const [key, value] of Object.entries(fields)) {
+    if (!value) {
+      return `${key} is required to create account`;
+    }
+  }
+  return null;
 };
 
-// Nilai yang didapat dari user
+// Fungsi untuk mengunggah berkas dengan penanganan kesalahan
+const handleFileUpload = async (file, uploadFunction) => {
+  try {
+    return await uploadFunction(file);
+  } catch (error) {
+    if (error.code === 400) {
+      return { status: 'fail', message: error.message };
+    }
+    throw error;
+  }
+};
+
 const signUpTutorsHandler = async (request, h) => {
   const {
     email,
@@ -40,7 +51,7 @@ const signUpTutorsHandler = async (request, h) => {
     cv,
   } = request.payload;
 
-  // Melakukan pengecekan jika ada nilai yang kosong
+  // Validasi field yang diperlukan
   const requiredFields = {
     email,
     phoneNumber,
@@ -51,20 +62,20 @@ const signUpTutorsHandler = async (request, h) => {
     domicile,
     languages,
     teachingCriteria,
+    ktp,
     subjects,
     rekeningNumber,
     availability,
     studiedMethod,
   };
 
-  for (const [key, value] of Object.entries(requiredFields)) {
-    if (!value) {
-      return createErrorResponse(h, `${key} is required to create account`);
-    }
+  const validationError = validateFields(requiredFields);
+  if (validationError) {
+    return createResponse(h, 400, 'fail', validationError);
   }
 
   try {
-    // Memeriksa apakah sudah ada user dengan email, nomor telepon, atau username yang sama
+    // Memeriksa apakah sudah ada user dengan email atau username yang sama
     const existingUser = await prisma.users.findFirst({
       where: {
         OR: [
@@ -75,101 +86,59 @@ const signUpTutorsHandler = async (request, h) => {
     });
 
     if (existingUser) {
-      return h.response({
-        status: 'error',
-        message: 'User already registered with the provided email, phone number, or username.',
-      }).code(400);
+      return createResponse(h, 400, 'fail', 'User already registered with the provided email or username');
     }
 
-    // Menggabungkan array languages menjadi string
-    const languagesString = Array.isArray(languages) ? languages.join(', ') : '';
-
-    // Upload Profile Picture to GCS
-    let profilePicUrl = 'https://storage.googleapis.com/simpan-data-gambar-user/arsip-profile-picture/profile-picture_default.png'; // default profile picture
-    if (profilePicture && profilePicture.hapi && profilePicture.hapi.filename) {
-      try {
-        profilePicUrl = await uploadProfilePicture(profilePicture);
-      } catch (error) {
-        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
-          return h.response({
-            status: 'fail',
-            message: error.message,
-          }).code(error.code || 400);
-        }
-        throw error;
-      }
+    // Mengunggah berkas
+    const ktpUrl = await handleFileUpload(ktp, uploadKtp);
+    if (ktpUrl.status === 'fail') {
+      return createResponse(h, 400, 'fail', ktpUrl.message);
     }
 
-    // Upload KTP to GCS
-    let ktpUrl = 'You have not upload KTP file already';
-    if (ktp && ktp.hapi && ktp.hapi.filename) {
-      try {
-        ktpUrl = await uploadKtp(ktp);
-      } catch (error) {
-        if (error.message === 'Invalid file type. Only PNG, JPG, and GIF files are allowed.') {
-          return h.response({
-            status: 'fail',
-            message: error.message,
-          }).code(error.code || 400);
-        }
-        throw error;
-      }
+    const profilePicUrl = profilePicture ? await handleFileUpload(profilePicture, uploadProfilePicture) : null;
+    if (profilePicUrl && profilePicUrl.status === 'fail') {
+      return createResponse(h, 400, 'fail', profilePicUrl.message);
     }
 
-    // Upload CV to GCS
-    let cvUrl = 'You have not uploaded a CV file yet';
-    if (cv && cv.hapi && cv.hapi.filename) {
-      try {
-        cvUrl = await uploadCv(cv);
-      } catch (error) {
-        if (error.message === 'Invalid file type. Only PDF files are allowed.') {
-          return h.response({
-            status: 'fail',
-            message: error.message,
-          }).code(error.code || 400);
-        }
-        throw error;
-      }
+    const cvUrl = cv ? await handleFileUpload(cv, uploadCv) : null;
+    if (cvUrl && cvUrl.status === 'fail') {
+      return createResponse(h, 400, 'fail', cvUrl.message);
     }
 
     // Hashing user's password
     const hash = await bcrypt.hash(password, 10);
 
     // Menambahkan user baru dan tutor baru dalam satu transaksi
-    const newUser = await prisma.$transaction(async (prisma) => {
-      const createdUser = await prisma.users.create({
-        data: {
-          email,
-          username,
-          password: hash,
-        },
-      });
+    const user = await prisma.users.create({
+      data: {
+        email,
+        username,
+        password: hash,
+      },
+    });
 
-      const createdTutor = await prisma.tutors.create({
-        data: {
-          user_id: createdUser.id,
-          education_level: educationLevel,
-          phone_number: phoneNumber,
-          gender,
-          domicile,
-          languages: languagesString,
-          subjects,
-          teaching_criteria: teachingCriteria,
-          rekening_number: rekeningNumber,
-          availability,
-          studied_method: studiedMethod,
-          ktp: ktpUrl,
-          profile_picture: profilePicUrl,
-          cv: cvUrl,
-        },
-      });
-
-      return { createdUser, createdTutor };
+    await prisma.tutors.create({
+      data: {
+        user_id: user.id,
+        education_level: educationLevel,
+        phone_number: phoneNumber,
+        gender,
+        domicile,
+        languages,
+        subjects,
+        teaching_criteria: teachingCriteria,
+        rekening_number: rekeningNumber,
+        availability,
+        studied_method: studiedMethod,
+        ktp: ktpUrl,
+        profile_picture: profilePicUrl,
+        cv: cvUrl,
+      },
     });
 
     return createResponse(h, 201, 'success', 'Tutor registered successfully', {
-      tutorEmail: newUser.createdUser.email,
-      username: newUser.createdUser.username,
+      email: user.email,
+      username: user.username,
     });
   } catch (error) {
     console.error(error);

@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const createResponse = require('../createResponse');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
