@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const { Storage } = require('@google-cloud/storage');
-const createResponse = require('../createResponse');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
