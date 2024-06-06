@@ -7,10 +7,11 @@ const prisma = new PrismaClient();
 const signUpLearnersHandler = async (request, h) => {
   const {
     email,
-    phoneNumber,
     username,
     password,
+    name,
     educationLevel,
+    phoneNumber,
     gender,
     domicile,
   } = request.payload;
@@ -19,10 +20,11 @@ const signUpLearnersHandler = async (request, h) => {
     // Checks for empty data in the payload
     const requiredFields = {
       email,
-      phoneNumber,
       username,
       password,
+      name,
       educationLevel,
+      phoneNumber,
       gender,
       domicile,
     };
@@ -62,6 +64,7 @@ const signUpLearnersHandler = async (request, h) => {
     await prisma.learners.create({
       data: {
         user_id: user.id,
+        name,
         education_level: educationLevel,
         phone_number: phoneNumber,
         gender,
