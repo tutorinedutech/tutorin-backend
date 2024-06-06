@@ -57,7 +57,7 @@ model Tutors {
   teaching_approach String
   phone_number      String
   rekening_number   String
-  learning_methods  String
+  learning_method  String
   ktp               String
   profile_picture   String?
   cv                String?

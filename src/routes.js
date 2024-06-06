@@ -12,6 +12,7 @@ const {
   updateUserAndTutor,
   signOutHandler,
   deleteFileTutorHandler,
+  transactionHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -128,7 +129,7 @@ const routes = [
   {
     method: 'POST',
     path: '/transactions',
-    handler: () => 'Transactions',
+    handler: transactionHandler,
   },
   {
     method: 'POST',
