@@ -12,6 +12,8 @@ const {
   updateUserAndTutor,
   signOutHandler,
   deleteFileTutorHandler,
+  requestMidtransToken,
+  getPaymentStatus,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -127,13 +129,19 @@ const routes = [
   },
   {
     method: 'POST',
+    options: {
+      auth: false,
+    },
     path: '/transactions',
-    handler: () => 'Transactions',
+    handler: requestMidtransToken,
   },
   {
-    method: 'POST',
+    method: 'GET',
     path: '/payment-status',
-    handler: () => 'payment-status',
+    options: {
+      auth: false,
+    },
+    handler: getPaymentStatus,
   },
 ];
 
