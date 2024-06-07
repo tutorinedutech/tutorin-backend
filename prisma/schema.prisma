@@ -84,8 +84,8 @@ model Class_sessions {
   id         Int      @id @default(autoincrement())
   learner_id Int
   tutor_id   Int
-  sessions   Int
-  subject    String
+  sessions   Int?
+  subject    String?
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 
@@ -101,7 +101,6 @@ model Class_details {
   validation_status String
   classSession      Class_sessions @relation(fields: [class_session_id], references: [id])
 }
-
 model Payment_transactions {
   id         String   @id
   learner_id Int
@@ -110,11 +109,11 @@ model Payment_transactions {
   sessions   Int?
   price      Float?
   amount     Float
-  fraud_status String
   created_at DateTime
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
+
 
 model Balances {
   id                     Int                       @id @default(autoincrement())

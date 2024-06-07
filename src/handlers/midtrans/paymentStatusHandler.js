@@ -11,23 +11,26 @@ const apiClient = new midtransClient.Snap({
 
 const paymentStatusHandler = async (request, h) => {
   const notificationJson = request.payload;
-
+  console.log(notificationJson);
   try {
+    console.log('hello_0');
     const statusResponse = await apiClient.transaction.notification(notificationJson);
+    console.log('hello_1');
     const {
       order_id: orderId,
       gross_amount: grossAmount,
       transaction_time: transactionTime,
       transaction_status: transactionStatus,
-      fraud_status: fraudStatus,
+      // fraud_status: fraudStatus,
     } = statusResponse;
-
-    console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}. Fraud status: ${fraudStatus}`);
+    console.log('hello_2');
+    console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}`);
 
     const [learnerId, tutorId, createdAt] = orderId.split('-');
-
+    console.log('hello_3');
+    // && fraudStatus === 'accept'
     let status;
-    if (transactionStatus === 'capture' && fraudStatus === 'accept') {
+    if (transactionStatus === 'capture') {
       status = 'success';
     } else if (transactionStatus === 'settlement') {
       status = 'success';
@@ -36,26 +39,41 @@ const paymentStatusHandler = async (request, h) => {
     } else if (transactionStatus === 'pending') {
       status = 'pending';
     }
-
+    console.log('hello_4');
     const parsedCreatedAt = new Date(transactionTime);
+    let newTransaction;
 
-    const newTransaction = await prisma.payment_transactions.create({
-      data: {
-        id: orderId,
-        learner_id: parseInt(learnerId),
-        tutor_id: parseInt(tutorId),
-        amount: parseFloat(grossAmount),
-        created_at: parsedCreatedAt,
-        fraud_status: status,
-      },
-    });
+    if (status === 'success') {
+      newTransaction = await prisma.payment_transactions.create({
+        data: {
+          id: orderId,
+          learner_id: parseInt(learnerId),
+          tutor_id: parseInt(tutorId),
+          amount: parseFloat(grossAmount),
+          created_at: parsedCreatedAt,
+          // fraud_status: status,
+        },
+      });
+      console.log(newTransaction);
+
+      // Create a new class session record
+      const newClassSession = await prisma.class_sessions.create({
+        data: {
+          learner_id: parseInt(learnerId),
+          tutor_id: parseInt(tutorId),
+          sessions: null, // Assuming sessions is to be null initially
+          subject: null, // Assuming subject is to be null initially
+        },
+      });
+      console.log(newClassSession);
+    }
 
     return h.response({
       status: 'success',
       data: newTransaction,
     }).code(200).type('application/json');
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return h.response({
       status: 'error',
       message: 'An error occurred while processing the payment notification',
@@ -64,197 +82,3 @@ const paymentStatusHandler = async (request, h) => {
 };
 
 module.exports = paymentStatusHandler;
-
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const extractIds = (orderId) => {
-//   const [learnerId, tutorId] = orderId.split('-');
-//   return {
-//     learnerId: parseInt(learnerId, 10),
-//     tutorId: parseInt(tutorId, 10),
-//   };
-// };
-
-// const paymentStatusHandler = async (request, h) => {
-//   const {
-//     transaction_time,
-//     transaction_status,
-//     order_id,
-//     gross_amount,
-//     fraud_status,
-//     currency,
-//     payment_type,
-//     signature_key,
-//     transaction_id,
-//     status_code,
-//     status_message,
-//     merchant_id,
-//     bill_key,
-//     biller_code,
-//     settlement_time,
-//     expiry_time,
-//     subject = null, // Nilai default null jika tidak disediakan
-//     sessions = null, // Nilai default null jika tidak disediakan
-//     price = null, // Nilai default null jika tidak disediakan
-//   } = request.payload;
-
-//   try {
-//     // Parsing values
-//     const { learnerId, tutorId } = extractIds(order_id);
-//     const grossAmount = parseFloat(gross_amount);
-//     const parsedCreatedAt = new Date(transaction_time);
-//     const status = fraud_status;
-
-//     // Membuat ID unik
-//     const id = `${learnerId}-${tutorId}-${parsedCreatedAt.getTime()}`;
-
-//     // Menyimpan ke database
-//     const transaction = await prisma.payment_transactions.create({
-//       data: {
-//         id,
-//         learner_id: learnerId,
-//         tutor_id: tutorId,
-//         amount: grossAmount,
-//         created_at: parsedCreatedAt,
-//         fraud_status: status,
-//       },
-//     });
-
-//     return h.response({ message: 'Transaction saved successfully', transaction }).code(201);
-//   } catch (error) {
-//     console.error(error);
-//     return h.response({ error: 'An error occurred' }).code(500);
-//   }
-// };
-
-// module.exports = paymentStatusHandler;
-
-// const midtransClient = require('midtrans-client');
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const apiClient = new midtransClient.Snap({
-//   isProduction: false,
-//   serverKey: process.env.MIDTRANS_SERVER_KEY,
-//   clientKey: process.env.MIDTRANS_CLIENT_KEY,
-// });
-
-// const extractIds = (orderId) => {
-//   const [learnerId, tutorId] = orderId.split('-');
-//   return {
-//     learnerId: parseInt(learnerId, 10),
-//     tutorId: parseInt(tutorId, 10),
-//   };
-// };
-
-// const paymentStatusHandler = async (request, h) => {
-//   try {
-//     const notificationJson = request.payload; // Assuming notification is sent in the request payload
-
-//     const {
-//       transaction_time,
-//       transaction_status,
-//       order_id,
-//       gross_amount,
-//       fraud_status,
-//       currency,
-//       payment_type,
-//       signature_key,
-//       transaction_id,
-//       status_code,
-//       status_message,
-//       merchant_id,
-//       bill_key,
-//       biller_code,
-//       settlement_time,
-//       expiry_time,
-//       subject = null,
-//       sessions = null,
-//       price = null,
-//     } = notificationJson;
-
-//     // Parsing values
-//     const { learnerId, tutorId } = extractIds(order_id);
-//     const grossAmount = parseFloat(gross_amount);
-//     const parsedCreatedAt = new Date(transaction_time);
-//     const status = fraud_status;
-
-//     // Membuat ID unik
-//     const id = `${learnerId}-${tutorId}-${parsedCreatedAt.getTime()}`;
-
-//     // Menyimpan ke database
-//     const transaction = await prisma.payment_transactions.create({
-//       data: {
-//         id,
-//         learner_id: learnerId,
-//         tutor_id: tutorId,
-//         amount: grossAmount,
-//         created_at: parsedCreatedAt,
-//         fraud_status: status,
-//       },
-//     });
-
-//     return { message: 'Transaction saved successfully', transaction };
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while handling notification');
-//   }
-// };
-
-// module.exports = paymentStatusHandler;
-
-// const fetch = require('node-fetch');
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const serverKey = 'YOUR_SERVER_KEY';
-// const baseUrl = 'https://api.sandbox.midtrans.com/v2';
-
-// // Fungsi untuk mendapatkan status transaksi dari Midtrans dan menyimpan ke database
-// const paymentStatusHandler = async (request, h) => {
-//   const getTransactionStatus = async (orderId) => {
-//     const response = await fetch(`${baseUrl}/${orderId}/status`, {
-//       headers: {
-//         Authorization: `Basic ${Buffer.from(`${serverKey}:`).toString('base64')}`,
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     const data = await response.json();
-//     return data;
-//   };
-
-//   const saveTransaction = async (transactionData) => {
-//     const itemDetails = transactionData.item_details[0]; // Assuming item details is an array, and we need the first item
-//     const transaction = {
-//       id: transactionData.transaction_id,
-//       learner_id: transactionData.customer_details.learner_id,
-//       tutor_id: transactionData.customer_details.tutor_id,
-//       subject: itemDetails.name,
-//       sessions: itemDetails.quantity,
-//       price: itemDetails.price,
-//       amount: parseFloat(transactionData.gross_amount),
-//       fraud_status: transactionData.fraud_status,
-//       created_at: new Date(transactionData.transaction_time),
-//     };
-
-//     await prisma.payment_transactions.create({ data: transaction });
-//     console.log('Transaction saved successfully');
-//   };
-
-//   const transactionData = request.payload;
-//   try {
-//     // Uncomment the line below if you need to fetch the transaction status from Midtrans
-//     // const transactionData = await getTransactionStatus(request.params.orderId);
-//     await saveTransaction(transactionData);
-//     return h.response({ status: 'success' }).code(200);
-//   } catch (error) {
-//     console.error('Error:', error);
-//     return h.response({ status: 'error', message: error.message }).code(500);
-//   }
-// };
-
-// module.exports = paymentStatusHandler;
