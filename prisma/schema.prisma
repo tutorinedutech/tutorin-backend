@@ -34,43 +34,53 @@ model Blacklist_token {
 model Learners {
   id              Int    @id @default(autoincrement())
   user_id         Int
+  name            String
   education_level String
   phone_number    String
   gender          String
   domicile        String
   user            Users  @relation(fields: [user_id], references: [id])
 
-  schedules      Schedules[]
-  transactionsIn Transactions_in[]
-  reviews        Reviews[]
+  classSessions       Class_sessions[]
+  paymentTransactions Payment_transactions[]
+  reviews             Reviews[]
 }
 
 model Tutors {
-  id                Int    @id @default(autoincrement())
+  id                Int     @id @default(autoincrement())
   user_id           Int
+  name              String
   education_level   String
   gender            String
   domicile          String
   languages         String
-  subjects          String
-  teaching_criteria String
+  teaching_approach String
   phone_number      String
   rekening_number   String
-  availability      String
-  studied_method    String
+  learning_method  String
   ktp               String
   profile_picture   String?
   cv                String?
-  user              Users  @relation(fields: [user_id], references: [id])
+  user              Users   @relation(fields: [user_id], references: [id])
 
-  schedules       Schedules[]
-  balances        Balances[]
-  transactionsIn  Transactions_in[]
-  transactionsOut Transactions_out[]
-  reviews         Reviews[]
+  availabilities         Availabilities[]
+  classSessions          Class_sessions[]
+  balances               Balances[]
+  paymentTransactions    Payment_transactions[]
+  withdrawalTransactions Withdrawal_transactions[]
+  reviews                Reviews[]
 }
 
-model Schedules {
+model Availabilities {
+  id       Int    @id @default(autoincrement())
+  tutor_id Int
+  subject  String
+  day      String
+  time     String
+  tutor    Tutors @relation(fields: [tutor_id], references: [id])
+}
+
+model Class_sessions {
   id         Int      @id @default(autoincrement())
   learner_id Int
   tutor_id   Int
@@ -78,36 +88,52 @@ model Schedules {
   subject    String
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
+
+  classDetails Class_details[]
 }
 
-model Transactions_in {
-  id         Int      @id @default(autoincrement())
+model Class_details {
+  id                Int            @id @default(autoincrement())
+  class_session_id  Int
+  timestamp         DateTime
+  location          String
+  proof_image_link  String
+  validation_status String
+  classSession      Class_sessions @relation(fields: [class_session_id], references: [id])
+}
+
+model Payment_transactions {
+  id         String   @id
   learner_id Int
   tutor_id   Int
-  total      Float
+  subject    String?
+  sessions   Int?
+  price      Float?
+  amount     Float
+  fraud_status String
   created_at DateTime
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
 
 model Balances {
-  id              Int                @id @default(autoincrement())
-  tutor_id        Int
-  total           Float
-  created_at      DateTime           @default(now())
-  updated_at      DateTime           @updatedAt
-  tutor           Tutors             @relation(fields: [tutor_id], references: [id])
-  transactionsOut Transactions_out[]
+  id                     Int                       @id @default(autoincrement())
+  tutor_id               Int
+  total                  Float
+  created_at             DateTime                  @default(now())
+  updated_at             DateTime                  @default(now()) @updatedAt
+  tutor                  Tutors                    @relation(fields: [tutor_id], references: [id])
+  withdrawalTransactions Withdrawal_transactions[]
 }
 
-model Transactions_out {
+model Withdrawal_transactions {
   id         Int      @id @default(autoincrement())
   balance_id Int
-  tutor_id   Int
-  total      Float
+  amount     Float
   created_at DateTime
   balance    Balances @relation(fields: [balance_id], references: [id])
-  tutor      Tutors   @relation(fields: [tutor_id], references: [id])
+  Tutors     Tutors?  @relation(fields: [tutorsId], references: [id])
+  tutorsId   Int?
 }
 
 model Messages {
@@ -127,7 +153,7 @@ model Reviews {
   rating     Int
   comment    String?
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now()) @updatedAt
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }

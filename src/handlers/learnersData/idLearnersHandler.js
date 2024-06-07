@@ -13,6 +13,7 @@ const idLearners = async (request, h) => {
         username: true,
         learners: {
           select: {
+            name: true,
             education_level: true,
             gender: true,
             domicile: true,
