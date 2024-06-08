@@ -43,6 +43,7 @@ model Learners {
 
   classSessions       Class_sessions[]
   paymentTransactions Payment_transactions[]
+  pendingPayments     Pending_payments[]
   reviews             Reviews[]
 }
 
@@ -67,6 +68,7 @@ model Tutors {
   classSessions          Class_sessions[]
   balances               Balances[]
   paymentTransactions    Payment_transactions[]
+  pendingPayments        Pending_payments[]
   withdrawalTransactions Withdrawal_transactions[]
   reviews                Reviews[]
 }
@@ -84,8 +86,8 @@ model Class_sessions {
   id         Int      @id @default(autoincrement())
   learner_id Int
   tutor_id   Int
-  sessions   Int?
-  subject    String?
+  sessions   Int
+  subject    String
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 
@@ -101,19 +103,30 @@ model Class_details {
   validation_status String
   classSession      Class_sessions @relation(fields: [class_session_id], references: [id])
 }
+
 model Payment_transactions {
   id         String   @id
   learner_id Int
   tutor_id   Int
-  subject    String?
-  sessions   Int?
-  price      Float?
+  subject    String
+  sessions   Int
+  price      Float
   amount     Float
   created_at DateTime
   learner    Learners @relation(fields: [learner_id], references: [id])
   tutor      Tutors   @relation(fields: [tutor_id], references: [id])
 }
 
+model Pending_payments {
+  id         String   @id
+  learner_id Int
+  tutor_id   Int
+  subject    String
+  sessions   Int
+  price      Float
+  learner    Learners @relation(fields: [learner_id], references: [id])
+  tutor      Tutors   @relation(fields: [tutor_id], references: [id])
+}
 
 model Balances {
   id                     Int                       @id @default(autoincrement())

@@ -14,6 +14,7 @@ const {
   deleteFileTutorHandler,
   transactionHandler,
   paymentStatusHandler,
+  deleteOldPendingPayments,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -126,6 +127,14 @@ const routes = [
     method: 'DELETE',
     path: '/tutors/{tutorId}',
     handler: deleteFileTutorHandler,
+  },
+  {
+    method: 'DELETE',
+    path: '/delete-pending-payments',
+    options: {
+      auth: false,
+    },
+    handler: deleteOldPendingPayments,
   },
   {
     method: 'POST',

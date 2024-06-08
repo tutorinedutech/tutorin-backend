@@ -1,5 +1,6 @@
 const midtransClient = require('midtrans-client');
 const { PrismaClient } = require('@prisma/client');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -21,14 +22,12 @@ const paymentStatusHandler = async (request, h) => {
       gross_amount: grossAmount,
       transaction_time: transactionTime,
       transaction_status: transactionStatus,
-      // fraud_status: fraudStatus,
     } = statusResponse;
     console.log('hello_2');
     console.log(`Transaction notification received. Order ID: ${orderId}. Transaction status: ${transactionStatus}`);
 
     const [learnerId, tutorId, createdAt] = orderId.split('-');
     console.log('hello_3');
-    // && fraudStatus === 'accept'
     let status;
     if (transactionStatus === 'capture') {
       status = 'success';
@@ -44,40 +43,44 @@ const paymentStatusHandler = async (request, h) => {
     let newTransaction;
 
     if (status === 'success') {
-      newTransaction = await prisma.payment_transactions.create({
-        data: {
+      const pendingPayment = await prisma.pending_payments.findUnique({
+        where: {
           id: orderId,
-          learner_id: parseInt(learnerId),
-          tutor_id: parseInt(tutorId),
-          amount: parseFloat(grossAmount),
-          created_at: parsedCreatedAt,
-          // fraud_status: status,
         },
       });
-      console.log(newTransaction);
 
-      // Create a new class session record
-      const newClassSession = await prisma.class_sessions.create({
-        data: {
-          learner_id: parseInt(learnerId),
-          tutor_id: parseInt(tutorId),
-          sessions: null, // Assuming sessions is to be null initially
-          subject: null, // Assuming subject is to be null initially
-        },
-      });
-      console.log(newClassSession);
+      if (pendingPayment) {
+        newTransaction = await prisma.payment_transactions.create({
+          data: {
+            id: orderId,
+            learner_id: parseInt(learnerId),
+            tutor_id: parseInt(tutorId),
+            amount: parseFloat(grossAmount),
+            created_at: parsedCreatedAt,
+            sessions: pendingPayment.sessions,
+            subject: pendingPayment.subject,
+            price: pendingPayment.price,
+          },
+        });
+        console.log(newTransaction);
+
+        // Create a new class session record
+        const newClassSession = await prisma.class_sessions.create({
+          data: {
+            learner_id: parseInt(learnerId),
+            tutor_id: parseInt(tutorId),
+            sessions: pendingPayment.sessions,
+            subject: pendingPayment.subject,
+          },
+        });
+        console.log(newClassSession);
+      }
     }
 
-    return h.response({
-      status: 'success',
-      data: newTransaction,
-    }).code(200).type('application/json');
+    return createResponse(h, 200, 'success', 'Success to saved transaction', newTransaction).code(200).type('application/json');
   } catch (error) {
     // console.error(error);
-    return h.response({
-      status: 'error',
-      message: 'An error occurred while processing the payment notification',
-    }).code(500).type('application/json');
+    return createResponse(h, 500, 'error', 'An error occurred while processing the payment notification').code(500).type('application/json');
   }
 };
 
