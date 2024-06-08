@@ -131,9 +131,6 @@ const routes = [
   {
     method: 'DELETE',
     path: '/delete-pending-payments',
-    options: {
-      auth: false,
-    },
     handler: deleteOldPendingPayments,
   },
   {
@@ -144,9 +141,6 @@ const routes = [
   {
     method: 'POST',
     path: '/payment-status',
-    options: {
-      auth: false,
-    },
     handler: paymentStatusHandler,
   },
 ];
