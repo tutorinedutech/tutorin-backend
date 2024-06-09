@@ -32,47 +32,47 @@ const handleFileUpload = async (file, uploadFunction) => {
 };
 
 const signUpTutorsHandler = async (request, h) => {
-  const {
-    email,
-    username,
-    password,
-    name,
-    educationLevel,
-    phoneNumber,
-    gender,
-    domicile,
-    languages,
-    teachingApproach,
-    ktp,
-    accountNumber,
-    learningMethod,
-    profilePicture,
-    cv,
-  } = request.payload;
-
-  // Validasi field yang diperlukan
-  const requiredFields = {
-    email,
-    username,
-    password,
-    name,
-    educationLevel,
-    phoneNumber,
-    gender,
-    domicile,
-    languages,
-    teachingApproach,
-    ktp,
-    accountNumber,
-    learningMethod,
-  };
-
-  const validationError = validateFields(requiredFields);
-  if (validationError) {
-    return createResponse(h, 400, 'fail', validationError);
-  }
-
   try {
+    const {
+      email,
+      username,
+      password,
+      name,
+      educationLevel,
+      phoneNumber,
+      gender,
+      domicile,
+      languages,
+      teachingApproach,
+      ktp,
+      accountNumber,
+      learningMethod,
+      profilePicture,
+      cv,
+    } = request.payload;
+
+    // Validasi field yang diperlukan
+    const requiredFields = {
+      email,
+      username,
+      password,
+      name,
+      educationLevel,
+      phoneNumber,
+      gender,
+      domicile,
+      languages,
+      teachingApproach,
+      ktp,
+      accountNumber,
+      learningMethod,
+    };
+
+    const validationError = validateFields(requiredFields);
+    if (validationError) {
+      return createResponse(h, 400, 'fail', validationError);
+    }
+
     // Memeriksa apakah sudah ada user dengan email atau username yang sama
     const existingUser = await prisma.users.findFirst({
       where: {
@@ -118,6 +118,7 @@ const signUpTutorsHandler = async (request, h) => {
     await prisma.tutors.create({
       data: {
         user_id: user.id,
+        name,
         education_level: educationLevel,
         phone_number: phoneNumber,
         gender,
@@ -136,10 +137,11 @@ const signUpTutorsHandler = async (request, h) => {
       email: user.email,
       username: user.username,
     });
+
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'Failed to register tutor due to an internal error');
   }
-};
+}
 
 module.exports = signUpTutorsHandler;

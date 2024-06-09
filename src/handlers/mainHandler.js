@@ -9,6 +9,9 @@ const idLearners = require('./learnersData/idLearnersHandler');
 const updateUserAndLearner = require('./updateTutorsAndLearners/learners/updateUserAndLearnerHandler');
 const updateUserAndTutor = require('./updateTutorsAndLearners/tutors/updateUserAndTutorHandler');
 const deleteFileTutorHandler = require('./deleteFile/deleteFileTutorHandler');
+const transactionHandler = require('./midtrans/transactionsHandler');
+const paymentStatusHandler = require('./midtrans/paymentStatusHandler');
+const { deleteOldPendingPayments } = require('./midtrans/deleteOldPendingPayments');
 
 module.exports = {
   signInHandler,
@@ -22,4 +25,7 @@ module.exports = {
   updateUserAndTutor,
   signOutHandler,
   deleteFileTutorHandler,
+  transactionHandler,
+  paymentStatusHandler,
+  deleteOldPendingPayments,
 };

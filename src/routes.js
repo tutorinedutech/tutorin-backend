@@ -12,6 +12,9 @@ const {
   updateUserAndTutor,
   signOutHandler,
   deleteFileTutorHandler,
+  transactionHandler,
+  paymentStatusHandler,
+  deleteOldPendingPayments,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -60,23 +63,23 @@ const routes = [
     handler: signUpLearnersHandler,
   },
   {
-    // buat nyari tutor nanti di sini ('/tutors/search')
+    // buat nyari tutor nanti di sini ('/tutors')
     method: 'GET',
     path: '/tutors',
     handler: allTutors,
   },
   {
-    // buat nampilin data tutor pas di klik di pencarian ('/tutors/{tutorId}/search')
+    // buat nampilin data tutor pas di klik di pencarian ('/tutors/{tutorId}/profile')
     method: 'GET',
-    path: '/tutors/{tutorId}',
+    path: '/tutors/{tutorId}/profile',
     handler: idTutors,
   },
-  {
-    // buat nampilin seluruh data tutor? harusnya kaga perlu ada
-    method: 'GET',
-    path: '/learners',
-    handler: allLearners,
-  },
+  // {
+  //   // buat nampilin seluruh data learner? harusnya kaga perlu ada
+  //   method: 'GET',
+  //   path: '/learners',
+  //   handler: allLearners,
+  // },
   {
     // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
     method: 'GET',
@@ -139,14 +142,19 @@ const routes = [
     handler: deleteFileTutorHandler,
   },
   {
+    method: 'DELETE',
+    path: '/delete-pending-payments',
+    handler: deleteOldPendingPayments,
+  },
+  {
     method: 'POST',
     path: '/transactions',
-    handler: () => 'Transactions',
+    handler: transactionHandler,
   },
   {
     method: 'POST',
     path: '/payment-status',
-    handler: () => 'payment-status',
+    handler: paymentStatusHandler,
   },
 ];
 
