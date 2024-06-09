@@ -13,6 +13,8 @@ const {
   signOutHandler,
   deleteFileTutorHandler,
   transactionHandler,
+  paymentStatusHandler,
+  deleteOldPendingPayments,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -127,6 +129,11 @@ const routes = [
     handler: deleteFileTutorHandler,
   },
   {
+    method: 'DELETE',
+    path: '/delete-pending-payments',
+    handler: deleteOldPendingPayments,
+  },
+  {
     method: 'POST',
     path: '/transactions',
     handler: transactionHandler,
@@ -134,7 +141,7 @@ const routes = [
   {
     method: 'POST',
     path: '/payment-status',
-    handler: () => 'payment-status',
+    handler: paymentStatusHandler,
   },
 ];
 

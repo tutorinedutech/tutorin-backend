@@ -3,6 +3,9 @@ const Hapi = require('@hapi/hapi');
 const HapiAuthJWT2 = require('hapi-auth-jwt2');
 const routes = require('./routes');
 const validate = require('./validate');
+const {
+  scheduleCleanupTask,
+} = require('./handlers/midtrans/deleteOldPendingPayments');
 
 const init = async () => {
   const server = Hapi.server({
@@ -29,6 +32,9 @@ const init = async () => {
   server.auth.default('jwt');
 
   server.route(routes);
+
+  // Schedule the cleanup task
+  scheduleCleanupTask();
 
   await server.start();
   console.log('Server running on %s', server.info.uri);
