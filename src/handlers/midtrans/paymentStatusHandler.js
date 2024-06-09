@@ -67,6 +67,7 @@ const paymentStatusHandler = async (request, h) => {
         // Create a new class session record
         const newClassSession = await prisma.class_sessions.create({
           data: {
+            id: newTransaction.id,
             learner_id: parseInt(learnerId),
             tutor_id: parseInt(tutorId),
             sessions: pendingPayment.sessions,
@@ -74,12 +75,23 @@ const paymentStatusHandler = async (request, h) => {
           },
         });
         console.log(newClassSession);
+        // Create a new class details record
+        const newClassDetails = await prisma.class_details.create({
+          data: {
+            class_session_id: newClassSession.id,
+            timestamp: null,
+            location: null,
+            proof_image_link: null,
+            validation_status: null,
+          },
+        });
+        console.log(newClassDetails);
       }
     }
 
     return createResponse(h, 200, 'success', 'Success to saved transaction', newTransaction).code(200).type('application/json');
   } catch (error) {
-    // console.error(error);
+    console.error(error);
     return createResponse(h, 500, 'error', 'An error occurred while processing the payment notification').code(500).type('application/json');
   }
 };
