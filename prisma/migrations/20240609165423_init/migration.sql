@@ -44,8 +44,8 @@ CREATE TABLE `Tutors` (
     `languages` VARCHAR(191) NOT NULL,
     `teaching_approach` VARCHAR(191) NOT NULL,
     `phone_number` VARCHAR(191) NOT NULL,
-    `rekening_number` VARCHAR(191) NOT NULL,
-    `learning_methods` VARCHAR(191) NOT NULL,
+    `account_number` VARCHAR(191) NOT NULL,
+    `learning_method` VARCHAR(191) NOT NULL,
     `ktp` VARCHAR(191) NOT NULL,
     `profile_picture` VARCHAR(191) NULL,
     `cv` VARCHAR(191) NULL,
@@ -66,7 +66,7 @@ CREATE TABLE `Availabilities` (
 
 -- CreateTable
 CREATE TABLE `Class_sessions` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` VARCHAR(191) NOT NULL,
     `learner_id` INTEGER NOT NULL,
     `tutor_id` INTEGER NOT NULL,
     `sessions` INTEGER NOT NULL,
@@ -78,11 +78,12 @@ CREATE TABLE `Class_sessions` (
 -- CreateTable
 CREATE TABLE `Class_details` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `class_session_id` INTEGER NOT NULL,
-    `timestamp` DATETIME(3) NOT NULL,
-    `location` VARCHAR(191) NOT NULL,
-    `proof_image_link` VARCHAR(191) NOT NULL,
-    `validation_status` VARCHAR(191) NOT NULL,
+    `class_session_id` VARCHAR(191) NOT NULL,
+    `session` INTEGER NOT NULL,
+    `timestamp` DATETIME(3) NULL,
+    `location` VARCHAR(191) NULL,
+    `proof_image_link` VARCHAR(191) NULL,
+    `validation_status` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -97,6 +98,18 @@ CREATE TABLE `Payment_transactions` (
     `price` DOUBLE NOT NULL,
     `amount` DOUBLE NOT NULL,
     `created_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Pending_payments` (
+    `id` VARCHAR(191) NOT NULL,
+    `learner_id` INTEGER NOT NULL,
+    `tutor_id` INTEGER NOT NULL,
+    `subject` VARCHAR(191) NOT NULL,
+    `sessions` INTEGER NOT NULL,
+    `price` DOUBLE NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -170,6 +183,12 @@ ALTER TABLE `Payment_transactions` ADD CONSTRAINT `Payment_transactions_learner_
 
 -- AddForeignKey
 ALTER TABLE `Payment_transactions` ADD CONSTRAINT `Payment_transactions_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Pending_payments` ADD CONSTRAINT `Pending_payments_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Pending_payments` ADD CONSTRAINT `Pending_payments_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Balances` ADD CONSTRAINT `Balances_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
