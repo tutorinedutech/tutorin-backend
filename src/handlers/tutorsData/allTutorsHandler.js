@@ -6,7 +6,13 @@ const prisma = new PrismaClient();
 const allTutors = async (request, h) => {
   try {
     const tutors = await prisma.tutors.findMany({
-      include: {
+      select: {
+        id: true,
+        user_id: true,
+        name: true,
+        education_level: true,
+        teaching_approach: true,
+        profile_picture: true,
         user: {
           select: {
             username: true,
@@ -15,13 +21,7 @@ const allTutors = async (request, h) => {
       },
     });
 
-    const result = tutors.map((tutor) => ({
-      username: tutor.user.username,
-      profile_picture: tutor.profile_picture,
-      subjects: tutor.subjects,
-    }));
-
-    return createResponse(h, 200, 'success', 'All data Tutors retrieved successfully', result);
+    return createResponse(h, 200, 'success', 'All data Tutors retrieved successfully', tutors);
   } catch (error) {
     console.error('Error fetching tutors:', error);
     return createResponse(h, 500, 'error', 'Data tutors cannot retrieved successfully, Failed to fetch tutors');

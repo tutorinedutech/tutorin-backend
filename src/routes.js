@@ -60,25 +60,36 @@ const routes = [
     handler: signUpLearnersHandler,
   },
   {
+    // buat nyari tutor nanti di sini ('/tutors/search')
     method: 'GET',
     path: '/tutors',
     handler: allTutors,
   },
   {
+    // buat nampilin data tutor pas di klik di pencarian ('/tutors/{tutorId}/search')
     method: 'GET',
-    path: '/tutors/{id}',
+    path: '/tutors/{tutorId}',
     handler: idTutors,
   },
   {
+    // buat nampilin seluruh data tutor? harusnya kaga perlu ada
     method: 'GET',
     path: '/learners',
     handler: allLearners,
   },
   {
+    // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
     method: 'GET',
     path: '/learners/{id}',
     handler: idLearners,
   },
+
+  // belum ada endpoint dan handler untuk menampilkan data profile tutor dan learner untuk dirinya sendiri
+
+  // '/tutors/{tutorId}/profile'
+
+  // '/learners/{learnerId}/profile'
+
   {
     method: 'PUT',
     path: '/learners/{id}',
@@ -108,13 +119,15 @@ const routes = [
   },
   {
     method: 'PUT',
-    path: '/tutors/{id}',
+    path: '/tutors/{tutorId}/profile',
     options: {
       payload: {
-        output: 'stream',
+        output: 'data', // 'data' untuk menangani JSON, stream bisa tetap untuk multipart
         parse: true,
-        allow: 'multipart/form-data',
-        multipart: true,
+        allow: ['multipart/form-data', 'application/json'],
+        multipart: {
+          output: 'stream',
+        },
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
@@ -122,7 +135,7 @@ const routes = [
   },
   {
     method: 'DELETE',
-    path: '/tutors/{tutorId}',
+    path: '/tutors/{tutorId}/profile',
     handler: deleteFileTutorHandler,
   },
   {
