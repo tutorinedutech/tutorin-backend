@@ -97,6 +97,7 @@ model Class_sessions {
 model Class_details {
   id                Int            @id @default(autoincrement())
   class_session_id  String
+  session           Int
   timestamp         DateTime?
   location          String?
   proof_image_link  String?
