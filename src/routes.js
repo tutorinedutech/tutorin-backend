@@ -15,6 +15,7 @@ const {
   transactionHandler,
   paymentStatusHandler,
   deleteOldPendingPayments,
+  tutorsHomeHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -61,6 +62,13 @@ const routes = [
       auth: false,
     },
     handler: signUpLearnersHandler,
+  },
+
+  // `/tutors/{tutorId}/home`
+  {
+    method: 'GET',
+    path: '/tutors/{tutorId}/home',
+    handler: tutorsHomeHandler,
   },
   {
     // buat nyari tutor nanti di sini ('/tutors')
