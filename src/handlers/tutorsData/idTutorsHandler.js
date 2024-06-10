@@ -4,30 +4,34 @@ const createResponse = require('../../createResponse');
 const prisma = new PrismaClient();
 
 const idTutors = async (request, h) => {
-  const { id } = request.params; // Ambil id dari params
+  const { tutorId } = request.params; // Ambil id dari params
   try {
     // Query untuk mendapatkan data tutor berdasarkan id
-    const user = await prisma.users.findUnique({
-      where: { id: parseInt(id) },
+    const tutor = await prisma.tutors.findUnique({
+      where: { id: parseInt(tutorId) },
       select: {
-        username: true,
-        tutors: {
+        id: true,
+        user_id: true,
+        name: true,
+        education_level: true,
+        gender: true,
+        domicile: true,
+        languages: true,
+        teaching_approach: true,
+        learning_method: true,
+        profile_picture: true,
+        cv: true,
+        user: {
           select: {
-            education_level: true,
-            gender: true,
-            domicile: true,
-            languages: true,
-            name: true,
-            teaching_approach: true,
-            learning_method: true,
-            profile_picture: true,
-            cv: true,
+            username: true,
           },
         },
+        availabilities: true,
+        reviews: true,
       },
     });
-      // Kirim respons dengan data tutor
-    return createResponse(h, 200, 'success', 'Data Tutors retrieved successfully', user);
+    // Kirim respons dengan data tutor
+    return createResponse(h, 200, 'success', 'Data Tutors retrieved successfully', tutor);
   } catch (error) {
     // Tangani kesalahan
     console.error('Error fetching tutor data:', error);

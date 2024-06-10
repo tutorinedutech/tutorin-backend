@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { Storage } = require('@google-cloud/storage');
 const Bcrypt = require('bcrypt');
 const {
   uploadKtp,
@@ -9,74 +10,159 @@ const createResponse = require('../../../createResponse');
 
 const prisma = new PrismaClient();
 
-const updateUserAndTutor = async (request, h) => {
-  const { id } = request.params;
-  const {
-    email,
-    username,
-    password,
-    educationLevel,
-    phoneNumber,
-    domicile,
-    languages,
-    subjects,
-    teachingCriteria,
-    rekeningNumber,
-    availability,
-    studiedMethod,
-    ktp,
-    profilePicture,
-    cv,
-  } = request.payload;
-  try {
-    // Ambil data user dari database untuk mendapatkan nilai saat ini
-    const currentUser = await prisma.users.findUnique({
-      where: { id: parseInt(id) },
-    });
+const storage = new Storage({
+  projectId: process.env.GOOGLE_PROJECT_ID,
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
 
-    if (!currentUser) {
-      return h.response({
-        status: 'fail',
-        message: 'User not found',
-      }).code(404);
+const bucketName = process.env.GOOGLE_BUCKET_NAME;
+
+const updateUserAndTutor = async (request, h) => {
+  const contentType = request.headers['content-type'];
+  const { tutorId } = request.params;
+
+  try {
+    if (contentType.includes('multipart/form-data')) {
+      const {
+        ktp,
+        profilePicture,
+        cv,
+      } = request.payload;
+
+      const tutor = await prisma.tutors.findFirst({
+        where: { id: parseInt(tutorId) },
+      });
+
+      if (ktp) {
+        const currentKtpUrl = tutor.ktp;
+        const parsedUrl = new URL(currentKtpUrl);
+        const filePath = parsedUrl.pathname.replace(`/${bucketName}/`, '');
+
+        await storage.bucket(bucketName).file(filePath).delete().catch((err) => {
+          console.error(`Failed to delete ktp: ${err.message}`);
+          return createResponse(500, 'fail', 'Failed to delete ktp');
+        });
+
+        const newKtpUrl = await uploadKtp(ktp);
+
+        await prisma.tutors.update({
+          where: { id: tutor.id },
+          data: {
+            ktp: newKtpUrl,
+          },
+        });
+      }
+
+      if (profilePicture) {
+        const currentProfilePictureUrl = tutor.profile_picture;
+
+        if (currentProfilePictureUrl) {
+          const parsedUrl = new URL(currentProfilePictureUrl);
+          const filePath = parsedUrl.pathname.replace(`/${bucketName}/`, '');
+
+          await storage.bucket(bucketName).file(filePath).delete().catch((err) => {
+            console.error(`Failed to delete profile picture: ${err.message}`);
+            return createResponse(500, 'fail', 'Failed to delete profile picture');
+          });
+        }
+
+        const newprofilePictureUrl = await uploadProfilePicture(profilePicture);
+
+        await prisma.tutors.update({
+          where: { id: tutor.id },
+          data: {
+            profile_picture: newprofilePictureUrl,
+          },
+        });
+      }
+
+      if (cv) {
+        const currentCvUrl = tutor.cv;
+
+        if (currentCvUrl) {
+          const parsedUrl = new URL(currentCvUrl);
+          const filePath = parsedUrl.pathname.replace(`/${bucketName}/`, '');
+
+          await storage.bucket(bucketName).file(filePath).delete().catch((err) => {
+            console.error(`Failed to delete CV: ${err.message}`);
+            return createResponse(500, 'fail', 'Failed to delete CV');
+          });
+        }
+
+        const newCvUrl = await uploadCv(cv);
+
+        await prisma.tutors.update({
+          where: { id: tutor.id },
+          data: {
+            cv: newCvUrl,
+          },
+        });
+      }
+
+      const updatedTutor = await prisma.tutors.findFirst({
+        where: { id: parseInt(tutorId) },
+        select: {
+          ktp: true,
+          profile_picture: true,
+          cv: true,
+        },
+      });
+
+      return createResponse(h, 200, 'success', 'Tutor profile file successfully updated', updatedTutor);
     }
+    const {
+      email,
+      username,
+      password,
+      name,
+      educationLevel,
+      phoneNumber,
+      domicile,
+      languages,
+      teachingApproach,
+      accountNumber,
+      availability,
+      learningMethod,
+    } = request.payload;
 
     // Ambil data tutor dari database untuk mendapatkan nilai saat ini
-    const currentTutor = await prisma.tutors.findFirst({
-      where: { user_id: parseInt(id) },
+    const tutor = await prisma.tutors.findFirst({
+      where: { id: parseInt(tutorId) },
+      include: {
+        user: true,
+      },
     });
 
+    // ubah pengembalian respon dengan menggunakan modul createRespon
+    if (!tutor.user) {
+      return createResponse(h, 404, 'fail', 'Tutor not found');
+    }
+
     // Gunakan nilai yang ada jika email atau username tidak diberikan
-    const newEmail = email || currentUser.email;
-    const newUsername = username || currentUser.username;
+    const newEmail = email || tutor.user.email;
+    const newUsername = username || tutor.user.username;
 
     // Periksa apakah email atau username sudah ada di database selain dari user yang sedang diupdate
     const emailExists = await prisma.users.findFirst({
       where: {
         email: newEmail,
-        id: { not: parseInt(id) },
+        id: { not: parseInt(tutor.user_id) },
       },
     });
 
     if (emailExists) {
-      return h.response({
-        status: 'fail',
-        message: 'Email already exists',
-      }).code(400);
+      return createResponse(h, 400, 'fail', 'Email already exists');
     }
 
     const usernameExists = await prisma.users.findFirst({
       where: {
         username: newUsername,
-        id: { not: parseInt(id) },
+        id: { not: parseInt(tutor.user_id) },
       },
     });
 
     if (usernameExists) {
-      return h.response({
-        status: 'fail',
-        message: 'Username already exists',
-      }).code(400);
+      return createResponse(h, 400, 'fail', 'Username already exists');
     }
 
     // Periksa apakah password ada, jika ada, hash password baru
@@ -85,51 +171,9 @@ const updateUserAndTutor = async (request, h) => {
       hashedPassword = await Bcrypt.hash(password, 10);
     }
 
-    // Upload file ke Google Cloud Storage dan dapatkan URLnya
-    let ktpUrl = null;
-    if (ktp) {
-      ktpUrl = await uploadKtp(ktp);
-    } else {
-      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
-      const tutor = await prisma.tutors.findFirst({
-        where: { user_id: parseInt(id) },
-      });
-      if (tutor) {
-        ktpUrl = tutor.ktp; // Gunakan nilai KTP yang sudah ada di database
-      }
-    }
-
-    // Upload file profilepicture Google Cloud Storage dan dapatkan URLnya
-    let profilePictureUrl = null;
-    if (profilePicture) {
-      profilePictureUrl = await uploadProfilePicture(profilePicture);
-    } else {
-      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
-      const tutor = await prisma.tutors.findFirst({
-        where: { user_id: parseInt(id) },
-      });
-      if (tutor) {
-        profilePictureUrl = tutor.profile_picture; // Gunakan nilai KTP yang sudah ada di database
-      }
-    }
-
-    // Upload file CV Google Cloud Storage dan dapatkan URLnya
-    let cvUrl = null;
-    if (cv) {
-      cvUrl = await uploadCv(cv);
-    } else {
-      // Jika KTP tidak diisi, gunakan nilai KTP yang sudah ada di database
-      const tutor = await prisma.tutors.findFirst({
-        where: { user_id: parseInt(id) },
-      });
-      if (tutor) {
-        cvUrl = tutor.cv; // Gunakan nilai KTP yang sudah ada di database
-      }
-    }
-
     // Perbarui data dalam tabel users
-    const updatedUser = await prisma.users.update({
-      where: { id: parseInt(id) },
+    await prisma.users.update({
+      where: { id: parseInt(tutor.user_id) },
       data: {
         email,
         username,
@@ -137,40 +181,73 @@ const updateUserAndTutor = async (request, h) => {
       },
     });
 
-    // Cari baris dalam tabel tutors berdasarkan user_id menggunakan findFirst
-    const tutor = await prisma.tutors.findFirst({
-      where: { user_id: parseInt(id) },
-    });
+    if (availability) {
+      try {
+        // Validasi bahwa availability adalah array dan tidak kosong
+        if (!Array.isArray(availability) || availability.length === 0) {
+          return createResponse(h, 400, 'fail', 'Invalid availability data');
+        }
 
-    // Jika baris dalam tabel tutors ditemukan, perbarui
-    let updatedTutor = null;
-    if (tutor) {
-      updatedTutor = await prisma.tutors.update({
-        where: { id: tutor.id }, // Gunakan id unik dari tabel tutors
-        data: {
-          education_level: educationLevel,
-          phone_number: phoneNumber,
-          domicile,
-          languages,
-          subjects,
-          teaching_criteria: teachingCriteria,
-          rekening_number: rekeningNumber,
-          availability,
-          studied_method: studiedMethod,
-          ...(ktpUrl && { ktp: ktpUrl }),
-          ...(profilePictureUrl && { profile_picture: profilePictureUrl }),
-          ...(cvUrl && { cv: cvUrl }),
+        await prisma.availabilities.deleteMany({
+          where: {
+            tutor_id: tutor.id,
+          },
+        });
 
-        },
-      });
+        const newAvailabilities = availability.map((avail) => ({
+          tutor_id: tutor.id,
+          subject: avail.subject,
+          day: avail.day,
+          time: avail.time,
+        }));
+
+        await prisma.availabilities.createMany({
+          data: newAvailabilities,
+        });
+
+        await prisma.availabilities.findMany({
+          where: {
+            tutor_id: tutor.id,
+          },
+          select: {
+            subject: true,
+            day: true,
+            time: true,
+          },
+        });
+      } catch (error) {
+        console.error(error);
+        return createResponse(h, 400, 'fail', 'Availability data format is incorrect');
+      }
     }
 
-    // Tanggapi dengan data yang diperbarui
-    return createResponse(h, 200, 'success', 'User and tutor data updated successfully', { updatedUser, updatedTutor });
+    // Jika baris dalam tabel tutors ditemukan, perbarui
+    await prisma.tutors.update({
+      where: { id: tutor.id },
+      data: {
+        name,
+        education_level: educationLevel,
+        phone_number: phoneNumber,
+        domicile,
+        languages,
+        teaching_approach: teachingApproach,
+        account_number: accountNumber,
+        learning_method: learningMethod,
+      },
+    });
+
+    const newTutor = await prisma.tutors.findUnique({
+      where: { id: tutor.id },
+      include: {
+        user: true,
+        availabilities: true,
+      },
+    });
+
+    return createResponse(h, 200, 'success', 'Tutor profile successfully updated', newTutor);
   } catch (error) {
-    // Tangani kesalahan
     console.error('Error updating user and tutor data:', error);
-    return createResponse(h, 500, 'error', 'User and tutor data cannot updated, Internal Server Error');
+    return createResponse(h, 500, 'error', 'Tutor profile cannot be updated, internal Server Error');
   }
 };
 

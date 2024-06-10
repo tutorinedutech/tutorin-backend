@@ -45,7 +45,7 @@ const signUpTutorsHandler = async (request, h) => {
       languages,
       teachingApproach,
       ktp,
-      rekeningNumber,
+      accountNumber,
       learningMethod,
       profilePicture,
       cv,
@@ -64,7 +64,7 @@ const signUpTutorsHandler = async (request, h) => {
       languages,
       teachingApproach,
       ktp,
-      rekeningNumber,
+      accountNumber,
       learningMethod,
     };
 
@@ -125,7 +125,7 @@ const signUpTutorsHandler = async (request, h) => {
         domicile,
         languages,
         teaching_approach: teachingApproach,
-        rekening_number: rekeningNumber,
+        account_number: accountNumber,
         learning_method: learningMethod,
         ktp: ktpUrl,
         profile_picture: profilePicUrl,
@@ -137,10 +137,11 @@ const signUpTutorsHandler = async (request, h) => {
       email: user.email,
       username: user.username,
     });
+
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'Failed to register tutor due to an internal error');
   }
-};
+}
 
 module.exports = signUpTutorsHandler;
