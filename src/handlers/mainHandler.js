@@ -12,6 +12,8 @@ const deleteFileTutorHandler = require('./deleteFile/deleteFileTutorHandler');
 const transactionHandler = require('./midtrans/transactionsHandler');
 const paymentStatusHandler = require('./midtrans/paymentStatusHandler');
 const { deleteOldPendingPayments } = require('./midtrans/deleteOldPendingPayments');
+const tutorsHomeHandler = require('./home/tutorsHomeHandler');
+const learnersHomeHandler = require('./home/learnersHomeHandler');
 
 module.exports = {
   signInHandler,
@@ -28,4 +30,6 @@ module.exports = {
   transactionHandler,
   paymentStatusHandler,
   deleteOldPendingPayments,
+  tutorsHomeHandler,
+  learnersHomeHandler,
 };

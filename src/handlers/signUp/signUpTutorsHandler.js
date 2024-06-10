@@ -137,11 +137,10 @@ const signUpTutorsHandler = async (request, h) => {
       email: user.email,
       username: user.username,
     });
-
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'Failed to register tutor due to an internal error');
   }
-}
+};
 
 module.exports = signUpTutorsHandler;
