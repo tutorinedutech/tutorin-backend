@@ -15,6 +15,8 @@ const {
   transactionHandler,
   paymentStatusHandler,
   deleteOldPendingPayments,
+  tutorProfileHandler,
+  learnerProfileHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -83,7 +85,7 @@ const routes = [
   {
     // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
     method: 'GET',
-    path: '/learners/{id}',
+    path: '/learners/{id}/search',
     handler: idLearners,
   },
 
@@ -91,7 +93,19 @@ const routes = [
 
   // '/tutors/{tutorId}/profile'
 
+  // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
+  {
+    method: 'GET',
+    path: '/tutors/my-profile-tutor',
+    handler: tutorProfileHandler,
+  },
+
   // '/learners/{learnerId}/profile'
+  {
+    method: 'GET',
+    path: '/tutors/my-profile-learner',
+    handler: learnerProfileHandler,
+  },
 
   {
     method: 'PUT',
