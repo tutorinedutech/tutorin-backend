@@ -99,7 +99,7 @@ const routes = [
   {
     // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
     method: 'GET',
-    path: '/learners/{id}/search',
+    path: '/learners/{learnerId}/search',
     handler: idLearners,
   },
 
