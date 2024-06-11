@@ -26,7 +26,7 @@ COPY . .
 RUN npx prisma generate
 
 # Build the application (if using TypeScript, transpile to JavaScript)
-RUN npm run build
+# RUN npm run build
 
 # Expose the application port
 EXPOSE 8080
