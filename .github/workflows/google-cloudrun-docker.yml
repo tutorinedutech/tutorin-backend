@@ -46,7 +46,7 @@ name: Build and Deploy to Cloud Run
 
 on:
   push:
-    branches: ["main"]
+    branches: ["test-ci-cd-1"]
 
 env:
   PROJECT_ID: tutorin-424608 # TODO: update Google Cloud project id
