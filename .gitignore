@@ -1,6 +1,8 @@
 node_modules/
+.eslintrc.json
 # Keep environment variables out of version control
 .env
 
 tutorin-424608-d350fc954c45.json
 serviceaccountkey.json
+github-actions-service-account.json
