@@ -1,14 +1,5 @@
+# Gunakan Node.js versi yang sesuai dengan Alpine sebagai base image
 FROM node:21.7.3-alpine3.18
-
-# WORKDIR /usr/src/app
-
-# COPY package*.json ./
-
-# RUN npm install
-
-# COPY . .
-
-# EXPOSE 5000
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -25,11 +16,13 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application (if using TypeScript, transpile to JavaScript)
-# RUN npm run build
+# Install Cloud SQL Proxy
+RUN apk add --no-cache libc6-compat
+RUN wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /cloud_sql_proxy \
+    && chmod +x /cloud_sql_proxy
 
 # Expose the application port
 EXPOSE 8080
 
-# Command to run the application
-CMD ["npm", "run", "start-prod"]
+# Command to run the application with Cloud SQL Proxy
+CMD ["/cloud_sql_proxy", "-instances=tutorin-424608:asia-southeast2:tutorin-db=tcp:3306", "&", "npm", "run", "start-prod"]
