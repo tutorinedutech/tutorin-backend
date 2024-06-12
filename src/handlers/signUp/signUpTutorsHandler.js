@@ -139,7 +139,7 @@ const signUpTutorsHandler = async (request, h) => {
     });
   } catch (error) {
     console.error(error);
-    return createResponse(h, 500, 'error', 'Failed to register tutor due to an internal error');
+    return createResponse(h, 500, 'error', 'Failed to register tutor due to an internal error', error);
   }
 };
 
