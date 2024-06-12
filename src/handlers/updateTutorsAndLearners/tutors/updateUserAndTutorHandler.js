@@ -243,7 +243,6 @@ const updateUserAndTutor = async (request, h) => {
         availabilities: true,
       },
     });
-
     return createResponse(h, 200, 'success', 'Tutor profile successfully updated', newTutor);
   } catch (error) {
     console.error('Error updating user and tutor data:', error);

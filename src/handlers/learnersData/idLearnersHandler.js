@@ -4,30 +4,36 @@ const createResponse = require('../../createResponse');
 const prisma = new PrismaClient();
 
 const idLearners = async (request, h) => {
-  const { id } = request.params; // Ambil id dari params
+  const { learnerId } = request.params; // Ambil learnerId dari params
   try {
-    // Query untuk mendapatkan data Learners berdasarkan id
-    const user = await prisma.users.findUnique({
-      where: { id: parseInt(id) },
+    // Query untuk mendapatkan data Learners berdasarkan learnerId
+    const learner = await prisma.learners.findUnique({
+      where: { id: parseInt(learnerId) },
       select: {
-        username: true,
-        learners: {
+        id: true,
+        user_id: true,
+        name: true,
+        education_level: true,
+        gender: true,
+        domicile: true,
+        user: {
           select: {
-            name: true,
-            education_level: true,
-            gender: true,
-            domicile: true,
+            username: true,
           },
         },
       },
     });
 
+    if (!learner) {
+      return createResponse(h, 404, 'error', 'Learner not found');
+    }
+
     // Kirim respons dengan data Learners
-    return createResponse(h, 200, 'success', 'Data learner retrieved successfully', user);
+    return createResponse(h, 200, 'success', 'Data learner retrieved successfully', learner);
   } catch (error) {
     // Tangani kesalahan
     console.error('Error fetching learner data:', error);
-    return createResponse(h, 500, 'error', 'Data learner cannot retrieved successfully, Internal Server Error');
+    return createResponse(h, 500, 'error', 'Data learner cannot be retrieved successfully, Internal Server Error');
   }
 };
 

@@ -9,6 +9,11 @@ const transactionHandler = async (request, h) => {
     learnerId, tutorId, subject, sessions, price,
   } = request.payload;
 
+  // Validasi jumlah sesi
+  // if (sessions > 10) {
+  //   return createResponse(h, 400, 'error', 'Jumlah sesi tidak boleh lebih dari 10').code(400).type('application/json');
+  // }
+
   const timestamp = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);
 
   try {
