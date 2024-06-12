@@ -85,9 +85,9 @@ const routes = [
     handler: allTutors,
   },
   {
-    // buat nampilin data tutor pas di klik di pencarian ('/tutors/{tutorId}/profile')
+    // buat nampilin data tutor by Id (buat nyari tutor nanti di sini)
     method: 'GET',
-    path: '/tutors/{tutorId}/profile',
+    path: '/tutors/{tutorId}/search',
     handler: idTutors,
   },
   // {
@@ -96,34 +96,30 @@ const routes = [
   //   path: '/learners',
   //   handler: allLearners,
   // },
+  // buat nampilin data learner by Id (buat nyari learner nanti di sini)
   {
-    // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
     method: 'GET',
     path: '/learners/{learnerId}/search',
     handler: idLearners,
   },
 
-  // belum ada endpoint dan handler untuk menampilkan data profile tutor dan learner untuk dirinya sendiri
-
-  // '/tutors/{tutorId}/profile'
-
-  // buat nampilin data tutor by ID? ('/learners/{learnerid}/search')
+  // buat nampilin data tutor itu sendiri
   {
     method: 'GET',
     path: '/tutors/my-profile-tutor',
     handler: tutorProfileHandler,
   },
 
-  // '/learners/{learnerId}/profile'
+  // buat nampilin data learner itu sendiri
   {
     method: 'GET',
     path: '/tutors/my-profile-learner',
     handler: learnerProfileHandler,
   },
-
+  // untuk melakukan update user dan learner
   {
     method: 'PUT',
-    path: '/learners/{id}',
+    path: '/learners/{id}/profile',
     options: {
       payload: {
         output: 'stream',
@@ -137,6 +133,7 @@ const routes = [
           id: Joi.number().integer().required(),
         }),
         payload: Joi.object({
+          name: Joi.string().optional(),
           email: Joi.string().email().optional(),
           username: Joi.string().optional(),
           password: Joi.string().optional(),
@@ -148,6 +145,7 @@ const routes = [
     },
     handler: updateUserAndLearner,
   },
+  // untuk melakukan update user dan tutor
   {
     method: 'PUT',
     path: '/tutors/{tutorId}/profile',
@@ -164,21 +162,25 @@ const routes = [
     },
     handler: updateUserAndTutor,
   },
+  // untuk menghapus file tutor
   {
     method: 'DELETE',
     path: '/tutors/{tutorId}/profile',
     handler: deleteFileTutorHandler,
   },
+  // untuk menghapus pending payments yang sudah expired
   {
     method: 'DELETE',
     path: '/delete-pending-payments',
     handler: deleteOldPendingPayments,
   },
+  // untuk melakukan transaksi
   {
     method: 'POST',
     path: '/transactions',
     handler: transactionHandler,
   },
+  // untuk mengecek dan menyimpan status pembayaran
   {
     method: 'POST',
     path: '/payment-status',
