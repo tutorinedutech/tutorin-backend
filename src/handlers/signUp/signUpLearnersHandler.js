@@ -74,7 +74,7 @@ const signUpLearnersHandler = async (request, h) => {
 
     return createResponse(h, 201, 'success', 'Learner registered successfully', { email: user.email, username: user.username });
   } catch (error) {
-    return createResponse(h, 500, 'error', 'Failed to register learner due to an internal error', console.error(error));
+    return createResponse(h, 500, 'error', 'Failed to register learner due to an internal error', error);
   }
 };
 
