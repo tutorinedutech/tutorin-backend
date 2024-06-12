@@ -113,7 +113,7 @@ const routes = [
   // buat nampilin data learner itu sendiri
   {
     method: 'GET',
-    path: '/tutors/my-profile-learner',
+    path: '/learners/my-profile-learner',
     handler: learnerProfileHandler,
   },
   // untuk melakukan update user dan learner

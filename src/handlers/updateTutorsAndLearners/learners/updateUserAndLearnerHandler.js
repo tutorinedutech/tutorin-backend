@@ -90,7 +90,7 @@ const updateUserAndLearner = async (request, h) => {
   } catch (error) {
     // Tangani kesalahan
     console.error('Error updating user and learner data:', error);
-    return createResponse(h, 500, 'error', 'User and learner data cannot be updated: ' + error.message);
+    return createResponse(h, 500, 'error', `User and learner data cannot be updated: ${error.message}`);
   }
 };
 
