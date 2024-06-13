@@ -162,12 +162,6 @@ const routes = [
     path: '/tutors/{tutorId}/profile',
     handler: deleteFileTutorHandler,
   },
-  // untuk menghapus pending payments yang sudah expired
-  // {
-  //   method: 'DELETE',
-  //   path: '/delete-pending-payments',
-  //   handler: deleteOldPendingPayments,
-  // },
   // untuk melakukan transaksi
   {
     method: 'POST',
