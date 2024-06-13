@@ -2,7 +2,7 @@ require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const JWT = require('jsonwebtoken');
 const Bcrypt = require('bcrypt');
-const createResponse = require('../../createResponse');
+const createResponse = require('../createResponse');
 
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET;
