@@ -184,6 +184,9 @@ const routes = [
   {
     method: 'POST',
     path: '/payment-status',
+    options: {
+      auth: false,
+    },
     handler: paymentStatusHandler,
   },
 ];
