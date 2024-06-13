@@ -90,13 +90,6 @@ const routes = [
     path: '/tutors/{tutorId}/search',
     handler: idTutors,
   },
-  
-  // {
-  //   // buat nampilin seluruh data learner? harusnya kaga perlu ada
-  //   method: 'GET',
-  //   path: '/learners',
-  //   handler: allLearners,
-  // },
   // buat nampilin data learner by Id (buat nyari learner nanti di sini)
   {
     method: 'GET',
