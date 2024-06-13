@@ -1,32 +1,32 @@
-const signInHandler = require('./signIn/signInHandler');
-const signUpTutorsHandler = require('./signUp/signUpTutorsHandler');
-const signUpLearnersHandler = require('./signUp/signUpLearnersHandler');
-const signOutHandler = require('./signOut/signOutHandler');
-const allTutors = require('./tutorsData/allTutorsHandler');
-const idTutors = require('./tutorsData/idTutorsHandler');
-const allLearners = require('./learnersData/allLearnersHandler');
-const idLearners = require('./learnersData/idLearnersHandler');
-const updateUserAndLearner = require('./updateTutorsAndLearners/learners/updateUserAndLearnerHandler');
-const updateUserAndTutor = require('./updateTutorsAndLearners/tutors/updateUserAndTutorHandler');
-const deleteFileTutorHandler = require('./deleteFile/deleteFileTutorHandler');
+const signInHandler = require('./signInHandler');
+const signUpTutorsHandler = require('./tutors/signUpTutorsHandler');
+const signUpLearnersHandler = require('./learners/signUpLearnersHandler');
+const signOutHandler = require('./signOutHandler');
+const searchTutorsHandler = require('./learners/searchTutorsHandler');
+const searchByIdTutorsHandler = require('./learners/searchByIdTutorsHandler');
+const searchLearnersHandler = require('./tutors/searchLearnersHandler');
+const searchByIdLearnersHandler = require('./tutors/searchByIdLearnersHandler');
+const updateProfileLearnersHandler = require('./learners/updateProfileLearnersHandler');
+const updateProfileTutorsHandler = require('./tutors/updateProfileTutorsHandler');
+const deleteFileTutorHandler = require('./tutors/deleteFileTutorsHandler');
 const transactionHandler = require('./midtrans/transactionsHandler');
 const paymentStatusHandler = require('./midtrans/paymentStatusHandler');
 const { deleteOldPendingPayments } = require('./midtrans/deleteOldPendingPayments');
-const tutorProfileHandler = require('./showUserProfile/tutorProfileHandler');
-const learnerProfileHandler = require('./showUserProfile/learnerProfileHandler');
-const tutorsHomeHandler = require('./home/tutorsHomeHandler');
-const learnersHomeHandler = require('./home/learnersHomeHandler');
+const tutorProfileHandler = require('./tutors/profileTutorsHandler');
+const learnerProfileHandler = require('./learners/profileLearnersHandler');
+const tutorsHomeHandler = require('./tutors/homeTutorsHandler');
+const learnersHomeHandler = require('./learners/homeLearnersHandler');
 
 module.exports = {
   signInHandler,
   signUpTutorsHandler,
   signUpLearnersHandler,
-  allTutors,
-  idTutors,
-  allLearners,
-  idLearners,
-  updateUserAndLearner,
-  updateUserAndTutor,
+  searchTutorsHandler,
+  searchByIdTutorsHandler,
+  searchLearnersHandler,
+  searchByIdLearnersHandler,
+  updateProfileLearnersHandler,
+  updateProfileTutorsHandler,
   signOutHandler,
   deleteFileTutorHandler,
   transactionHandler,

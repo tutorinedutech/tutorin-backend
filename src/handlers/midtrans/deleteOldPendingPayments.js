@@ -1,4 +1,3 @@
-// cleanup.js
 const { PrismaClient } = require('@prisma/client');
 const cron = require('node-cron');
 

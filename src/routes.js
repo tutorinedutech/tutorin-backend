@@ -1,14 +1,11 @@
-const Joi = require('joi');
-
 const {
   signInHandler,
   signUpTutorsHandler,
   signUpLearnersHandler,
-  allTutors,
-  idTutors,
-  idLearners,
-  updateUserAndLearner,
-  updateUserAndTutor,
+  searchTutorsHandler,
+  searchByIdTutorsHandler,
+  updateProfileLearnersHandler,
+  updateProfileTutorsHandler,
   signOutHandler,
   deleteFileTutorHandler,
   transactionHandler,
@@ -78,19 +75,13 @@ const routes = [
     // buat nyari tutor nanti di sini ('/tutors')
     method: 'GET',
     path: '/tutors',
-    handler: allTutors,
+    handler: searchTutorsHandler,
   },
   {
     // buat nampilin data tutor by Id (buat nyari tutor nanti di sini)
     method: 'GET',
     path: '/tutors/{tutorId}/search',
-    handler: idTutors,
-  },
-  // buat nampilin data learner by Id (buat nyari learner nanti di sini)
-  {
-    method: 'GET',
-    path: '/learners/{learnerId}/search',
-    handler: idLearners,
+    handler: searchByIdTutorsHandler,
   },
   // buat nampilin data tutor itu sendiri
   {
@@ -116,22 +107,8 @@ const routes = [
         multipart: true,
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
-      validate: {
-        params: Joi.object({
-          id: Joi.number().integer().required(),
-        }),
-        payload: Joi.object({
-          name: Joi.string().optional(),
-          email: Joi.string().email().optional(),
-          username: Joi.string().optional(),
-          password: Joi.string().optional(),
-          educationLevel: Joi.string().optional(),
-          phoneNumber: Joi.string().optional(),
-          domicile: Joi.string().optional(),
-        }),
-      },
     },
-    handler: updateUserAndLearner,
+    handler: updateProfileLearnersHandler,
   },
   // untuk melakukan update user dan tutor
   {
@@ -148,7 +125,7 @@ const routes = [
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
-    handler: updateUserAndTutor,
+    handler: updateProfileTutorsHandler,
   },
   // untuk menghapus file tutor
   {
