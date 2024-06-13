@@ -1,7 +1,16 @@
 const { Storage } = require('@google-cloud/storage');
 const { v4: uuidv4 } = require('uuid');
 
-const storage = new Storage();
+let storage = null;
+
+if (process.env.NODE_ENV !== 'production') {
+  storage = new Storage({
+    projectId: process.env.GOOGLE_PROJECT_ID,
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  });
+} else {
+  storage = new Storage();
+}
 
 const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
