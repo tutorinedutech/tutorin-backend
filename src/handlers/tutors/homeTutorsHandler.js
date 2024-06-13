@@ -3,7 +3,7 @@ const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const tutorsHomeHandler = async (request, h) => {
+const homeTutorsHandler = async (request, h) => {
   try {
     const { tutorId } = request.params;
 
@@ -50,4 +50,4 @@ const tutorsHomeHandler = async (request, h) => {
   }
 };
 
-module.exports = tutorsHomeHandler;
+module.exports = homeTutorsHandler;
