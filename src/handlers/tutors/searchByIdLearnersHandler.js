@@ -3,7 +3,7 @@ const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const idLearners = async (request, h) => {
+const searchByIdLearnersHandler = async (request, h) => {
   const { learnerId } = request.params; // Ambil learnerId dari params
   try {
     // Query untuk mendapatkan data Learners berdasarkan learnerId
@@ -37,4 +37,4 @@ const idLearners = async (request, h) => {
   }
 };
 
-module.exports = idLearners;
+module.exports = searchByIdLearnersHandler;
