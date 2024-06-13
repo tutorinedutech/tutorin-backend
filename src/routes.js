@@ -6,7 +6,6 @@ const {
   signUpLearnersHandler,
   allTutors,
   idTutors,
-  allLearners,
   idLearners,
   updateUserAndLearner,
   updateUserAndTutor,
@@ -14,7 +13,6 @@ const {
   deleteFileTutorHandler,
   transactionHandler,
   paymentStatusHandler,
-  deleteOldPendingPayments,
   tutorProfileHandler,
   learnerProfileHandler,
   tutorsHomeHandler,
@@ -66,8 +64,6 @@ const routes = [
     },
     handler: signUpLearnersHandler,
   },
-
-  // `/tutors/{tutorId}/home`
   {
     method: 'GET',
     path: '/tutors/{tutorId}/home',
@@ -90,26 +86,18 @@ const routes = [
     path: '/tutors/{tutorId}/search',
     handler: idTutors,
   },
-  // {
-  //   // buat nampilin seluruh data learner? harusnya kaga perlu ada
-  //   method: 'GET',
-  //   path: '/learners',
-  //   handler: allLearners,
-  // },
   // buat nampilin data learner by Id (buat nyari learner nanti di sini)
   {
     method: 'GET',
     path: '/learners/{learnerId}/search',
     handler: idLearners,
   },
-
   // buat nampilin data tutor itu sendiri
   {
     method: 'GET',
     path: '/tutors/my-profile-tutor',
     handler: tutorProfileHandler,
   },
-
   // buat nampilin data learner itu sendiri
   {
     method: 'GET',
