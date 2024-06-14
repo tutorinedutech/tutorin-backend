@@ -5,8 +5,8 @@ const {
   uploadKtp,
   uploadProfilePicture,
   uploadCv,
-} = require('../../../uploadFileToGCS');
-const createResponse = require('../../../createResponse');
+} = require('../../uploadFileToGCS');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ const storage = new Storage({
 
 const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
-const updateUserAndTutor = async (request, h) => {
+const updateProfileTutorsHandler = async (request, h) => {
   const contentType = request.headers['content-type'];
   const { tutorId } = request.params;
 
@@ -250,4 +250,4 @@ const updateUserAndTutor = async (request, h) => {
   }
 };
 
-module.exports = updateUserAndTutor;
+module.exports = updateProfileTutorsHandler;

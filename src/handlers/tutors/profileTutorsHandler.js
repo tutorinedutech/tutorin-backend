@@ -5,7 +5,7 @@ const createResponse = require('../../createResponse');
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET;
 
-const tutorProfileHandler = async (request, h) => {
+const profileTutorsHandler = async (request, h) => {
   try {
     // Dapatkan token dari header Authorization
     const { authorization } = request.headers;
@@ -43,4 +43,4 @@ const tutorProfileHandler = async (request, h) => {
   }
 };
 
-module.exports = tutorProfileHandler;
+module.exports = profileTutorsHandler;

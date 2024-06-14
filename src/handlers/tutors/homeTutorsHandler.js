@@ -3,30 +3,32 @@ const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const learnersHomeHandler = async (request, h) => {
+const homeTutorsHandler = async (request, h) => {
   try {
-    const { learnerId } = request.params;
+    const { tutorId } = request.params;
 
-    const learner = await prisma.learners.findUnique({
-      where: { id: parseInt(learnerId) },
+    const tutor = await prisma.tutors.findUnique({
+      where: { id: parseInt(tutorId) },
       select: {
         id: true,
         user_id: true,
         name: true,
+        profile_picture: true,
         user: {
           select: {
             username: true,
           },
         },
+        reviews: true,
         classSessions: true,
       },
     });
 
-    if (!learner) {
-      return createResponse(h, 404, 'fail', 'Learner not found');
+    if (!tutor) {
+      return createResponse(h, 404, 'fail', 'Tutor not found');
     }
 
-    const classSessionIds = learner.classSessions.map((session) => session.id);
+    const classSessionIds = tutor.classSessions.map((session) => session.id);
 
     const classDetails = await prisma.class_details.findMany({
       where: {
@@ -37,15 +39,15 @@ const learnersHomeHandler = async (request, h) => {
     });
 
     const result = {
-      ...learner,
+      ...tutor,
       classDetails,
     };
 
-    return createResponse(h, 200, 'success', 'Successfully get learner data on homepage', result);
+    return createResponse(h, 200, 'success', 'Successfully get tutor data on homepage', result);
   } catch (error) {
     console.error(error);
-    return createResponse(h, 500, 'error', 'Learner data on the homepage cannot be retrieved'); F;
+    return createResponse(h, 500, 'error', 'Tutor data on the homepage cannot be retrieved');
   }
 };
 
-module.exports = learnersHomeHandler;
+module.exports = homeTutorsHandler;

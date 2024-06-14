@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcrypt');
-const createResponse = require('../../../createResponse');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const updateUserAndLearner = async (request, h) => {
+const updateProfileLearnersHandler = async (request, h) => {
   const { id } = request.params; // Menggunakan id dari URL
   const {
     name,
@@ -94,4 +94,4 @@ const updateUserAndLearner = async (request, h) => {
   }
 };
 
-module.exports = updateUserAndLearner;
+module.exports = updateProfileLearnersHandler;

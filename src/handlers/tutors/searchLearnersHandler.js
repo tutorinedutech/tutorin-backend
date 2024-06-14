@@ -3,7 +3,7 @@ const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const allLearners = async (request, h) => {
+const searchLearnersHandler = async (request, h) => {
   try {
     const learners = await prisma.learners.findMany({
       include: {
@@ -28,4 +28,4 @@ const allLearners = async (request, h) => {
   }
 };
 
-module.exports = allLearners;
+module.exports = searchLearnersHandler;
