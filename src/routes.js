@@ -84,7 +84,7 @@ const routes = [
   {
     // buat nampilin data tutor by Id (buat nyari tutor nanti di sini)
     method: 'GET',
-    path: '/tutors/search/{tutorId}',
+    path: '/tutors/{tutorId}',
     handler: searchByIdTutorsHandler,
   },
   // buat nampilin data tutor itu sendiri
