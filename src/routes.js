@@ -14,6 +14,10 @@ const {
   profileLearnersHandler,
   homeTutorsHandler,
   homeLearnersHandler,
+  submitValidationHandler,
+  confirmValidationHandler,
+  detailLearningHandler,
+  detailTutoringHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -138,6 +142,40 @@ const routes = [
       auth: false,
     },
     handler: paymentStatusHandler,
+  },
+  // mendapatkan "detail learning" dari learner yang telah memesan tutors
+  {
+    method: 'GET',
+    path: '/class-details/detail-learning',
+    handler: detailLearningHandler,
+  },
+  // mendapatkan "detail tutoring" dari tutor yang sudah dipesan
+  {
+    method: 'GET',
+    path: '/class-details/detail-tutoring',
+    handler: detailTutoringHandler,
+  },
+  // melakukan update tutor dengan menambahkan file gambar dan lokasi kursus dilaksanakan
+  {
+    method: 'PUT',
+    path: '/class-details/detail-learning/{classDetailsId}',
+    options: {
+      auth: false,
+      payload: {
+        output: 'stream',
+        parse: true,
+        allow: 'multipart/form-data',
+        multipart: true,
+        maxBytes: 2 * 1024 * 1024, // 2 MB limit
+      },
+    },
+    handler: submitValidationHandler,
+  },
+  // melakukan update dengan memberikan nilai validate_status = Aprroved.
+  {
+    method: 'PUT',
+    path: '/class-details/detail-tutoring/{classDetailsId}',
+    handler: confirmValidationHandler,
   },
 ];
 

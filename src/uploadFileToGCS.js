@@ -48,9 +48,11 @@ const uploadFile = async (file, folderName, validTypes, validExtensions) => {
 const uploadKtp = (ktpFile) => uploadFile(ktpFile, 'ktp', ['image/png', 'image/jpeg'], ['png', 'jpg', 'jpeg']);
 const uploadProfilePicture = (profilePictureFile) => uploadFile(profilePictureFile, 'profile-picture', ['image/png', 'image/jpeg'], ['png', 'jpg', 'jpeg']);
 const uploadCv = (cvFile) => uploadFile(cvFile, 'cv', ['application/pdf'], ['pdf']);
+const uploadValidation = (validationFile) => uploadFile(validationFile, 'validation', ['image/png', 'image/jpeg'], ['png', 'jpg', 'jpeg']);
 
 module.exports = {
   uploadKtp,
   uploadProfilePicture,
   uploadCv,
+  uploadValidation,
 };
