@@ -16,8 +16,13 @@ const profileTutorsHandler = require('./tutors/profileTutorsHandler');
 const profileLearnersHandler = require('./learners/profileLearnersHandler');
 const homeTutorsHandler = require('./tutors/homeTutorsHandler');
 const homeLearnersHandler = require('./learners/homeLearnersHandler');
+const submitValidationHandler = require('./tutors/submitValidationHandler');
+const detailLearningHandler = require('./tutors/detailLearningHandler');
+const detailTutoringHandler = require('./learners/detailTutoringHandler');
+const confirmValidationHandler = require('./learners/confirmValidationHandler');
 
 module.exports = {
+
   signInHandler,
   signUpTutorsHandler,
   signUpLearnersHandler,
@@ -36,4 +41,8 @@ module.exports = {
   profileLearnersHandler,
   homeTutorsHandler,
   homeLearnersHandler,
+  submitValidationHandler,
+  confirmValidationHandler,
+  detailLearningHandler,
+  detailTutoringHandler,
 };

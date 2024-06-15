@@ -30,7 +30,7 @@ const updateProfileTutorsHandler = async (request, h) => {
     const contentType = request.headers['content-type'];
 
     if (!contentType) {
-      return createResponse(h, 400, 'fail', 'Invalid content-type')
+      return createResponse(h, 400, 'fail', 'Invalid content-type');
     }
 
     const { authorization } = request.headers;

@@ -78,6 +78,8 @@ const paymentStatusHandler = async (request, h) => {
 
         // Create a new class details record
         for (let i = 0; i < pendingPayment.sessions; i++) {
+          // const classSessionId = `${newClassSession.id}-${i + 1}`;
+          // console.log(`Generated class_session_id: ${classSessionId}`);
           const newClassDetails = await prisma.class_details.create({
             data: {
               class_session_id: newClassSession.id,
