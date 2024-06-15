@@ -77,14 +77,14 @@ const routes = [
   },
   {
     // buat nyari tutor nanti di sini ('/tutors')
-    method: 'GET',
-    path: '/tutors/search',
+    method: 'POST',
+    path: '/tutors',
     handler: searchTutorsHandler,
   },
   {
     // buat nampilin data tutor by Id (buat nyari tutor nanti di sini)
     method: 'GET',
-    path: '/tutors/search/{tutorId}',
+    path: '/tutors/{tutorId}',
     handler: searchByIdTutorsHandler,
   },
   // buat nampilin data tutor itu sendiri
