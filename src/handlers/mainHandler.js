@@ -16,8 +16,11 @@ const tutorProfileHandler = require('./tutors/profileTutorsHandler');
 const learnerProfileHandler = require('./learners/profileLearnersHandler');
 const tutorsHomeHandler = require('./tutors/homeTutorsHandler');
 const learnersHomeHandler = require('./learners/homeLearnersHandler');
+const submitValidation = require('./tutors/submitValidationHandler');
+const getDetailLearning = require('./tutors/getDetailLearning');
 
 module.exports = {
+
   signInHandler,
   signUpTutorsHandler,
   signUpLearnersHandler,
@@ -36,4 +39,6 @@ module.exports = {
   learnerProfileHandler,
   tutorsHomeHandler,
   learnersHomeHandler,
+  submitValidation,
+  getDetailLearning,
 };

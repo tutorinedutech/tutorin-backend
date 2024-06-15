@@ -14,6 +14,8 @@ const {
   learnerProfileHandler,
   tutorsHomeHandler,
   learnersHomeHandler,
+  submitValidation,
+  getDetailLearning,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -147,6 +149,17 @@ const routes = [
       auth: false,
     },
     handler: paymentStatusHandler,
+  },
+
+  {
+    method: 'PUT',
+    path: '/class-details/{tutorId}/schedules',
+    handler: submitValidation,
+  },
+  {
+    method: 'GET',
+    path: '/class-details/detail-learning',
+    handler: getDetailLearning,
   },
 ];
 
