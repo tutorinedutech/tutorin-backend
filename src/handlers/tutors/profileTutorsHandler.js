@@ -17,7 +17,6 @@ const profileTutorsHandler = async (request, h) => {
     const decoded = JWT.verify(token, secret);
 
     const { tutorId } = decoded; // Mengambil tutorId dari token
-    console.log('Decoded TutorID:', tutorId);
 
     if (!tutorId) {
       return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
