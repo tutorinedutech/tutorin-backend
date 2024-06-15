@@ -73,8 +73,8 @@ const routes = [
   },
   {
     // buat nyari tutor nanti di sini ('/tutors')
-    method: 'GET',
-    path: '/tutors/search',
+    method: 'POST',
+    path: '/tutors',
     handler: searchTutorsHandler,
   },
   {
