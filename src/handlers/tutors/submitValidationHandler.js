@@ -19,7 +19,7 @@ const handleFileUpload = async (file, uploadFunction) => {
   }
 };
 
-const submitValidation = async (request, h) => {
+const submitValidationHandler = async (request, h) => {
   try {
     // Dapatkan token dari header Authorization
     const { authorization } = request.headers;
@@ -96,4 +96,4 @@ const submitValidation = async (request, h) => {
   }
 };
 
-module.exports = submitValidation;
+module.exports = submitValidationHandler;

@@ -14,7 +14,7 @@ const {
   profileLearnersHandler,
   homeTutorsHandler,
   homeLearnersHandler,
-  submitValidation,
+  submitValidationHandler,
   confirmValidationHandler,
   detailLearningHandler,
   detailTutoringHandler,
@@ -169,7 +169,7 @@ const routes = [
         maxBytes: 2 * 1024 * 1024, // 2 MB limit
       },
     },
-    handler: submitValidation,
+    handler: submitValidationHandler,
   },
   // melakukan update dengan memberikan nilai validate_status = Aprroved.
   {
