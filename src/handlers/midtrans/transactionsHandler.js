@@ -4,7 +4,7 @@ const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
 
-const transactionHandler = async (request, h) => {
+const transactionsHandler = async (request, h) => {
   const {
     learnerId, tutorId, subject, sessions, price,
   } = request.payload;
@@ -112,4 +112,4 @@ const transactionHandler = async (request, h) => {
   }
 };
 
-module.exports = transactionHandler;
+module.exports = transactionsHandler;

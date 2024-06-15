@@ -9,7 +9,7 @@ const storage = new Storage({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
 
-const deleteFileTutorHandler = async (request, h) => {
+const deleteFileTutorsHandler = async (request, h) => {
   try {
     const { tutorId } = request.params;
     const { file } = request.query;
@@ -63,4 +63,4 @@ const deleteFileTutorHandler = async (request, h) => {
   }
 };
 
-module.exports = deleteFileTutorHandler;
+module.exports = deleteFileTutorsHandler;

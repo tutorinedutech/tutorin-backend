@@ -7,13 +7,13 @@ const {
   updateProfileLearnersHandler,
   updateProfileTutorsHandler,
   signOutHandler,
-  deleteFileTutorHandler,
-  transactionHandler,
+  deleteFileTutorsHandler,
+  transactionsHandler,
   paymentStatusHandler,
-  tutorProfileHandler,
-  learnerProfileHandler,
-  tutorsHomeHandler,
-  learnersHomeHandler,
+  profileTutorsHandler,
+  profileLearnersHandler,
+  homeTutorsHandler,
+  homeLearnersHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -63,13 +63,13 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/tutors/{tutorId}/home',
-    handler: tutorsHomeHandler,
+    path: '/tutors/{tutorId}/home', // kaga perlu request parameter
+    handler: homeTutorsHandler,
   },
   {
     method: 'GET',
-    path: '/learners/{learnerId}/home',
-    handler: learnersHomeHandler,
+    path: '/learners/{learnerId}/home', // kaga perlu request parameter
+    handler: homeLearnersHandler,
   },
   {
     // buat nyari tutor nanti di sini ('/tutors')
@@ -87,13 +87,13 @@ const routes = [
   {
     method: 'GET',
     path: '/tutors/my-profile-tutor',
-    handler: tutorProfileHandler,
+    handler: profileTutorsHandler,
   },
   // buat nampilin data learner itu sendiri
   {
     method: 'GET',
     path: '/learners/my-profile-learner',
-    handler: learnerProfileHandler,
+    handler: profileLearnersHandler,
   },
   // untuk melakukan update user dan learner
   {
@@ -131,13 +131,13 @@ const routes = [
   {
     method: 'DELETE',
     path: '/tutors/{tutorId}/profile',
-    handler: deleteFileTutorHandler,
+    handler: deleteFileTutorsHandler,
   },
   // untuk melakukan transaksi
   {
     method: 'POST',
     path: '/transactions',
-    handler: transactionHandler,
+    handler: transactionsHandler,
   },
   // untuk mengecek dan menyimpan status pembayaran
   {
