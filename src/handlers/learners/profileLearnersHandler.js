@@ -17,7 +17,6 @@ const profileLearnersHandler = async (request, h) => {
     const decoded = JWT.verify(token, secret);
 
     const { learnerId } = decoded; // Mengambil learnerId dari token
-    console.log('Decoded LearnerID:', learnerId);
 
     if (!learnerId) {
       return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');

@@ -1,3 +1,4 @@
+const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { Storage } = require('@google-cloud/storage');
 const Bcrypt = require('bcrypt');
@@ -8,20 +9,39 @@ const {
 } = require('../../uploadFileToGCS');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
-const storage = new Storage({
-  projectId: process.env.GOOGLE_PROJECT_ID,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
+let storage = null;
+
+if (process.env.NODE_ENV !== 'production') {
+  storage = new Storage({
+    projectId: process.env.GOOGLE_PROJECT_ID,
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  });
+} else {
+  storage = new Storage();
+}
 
 const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
 const updateProfileTutorsHandler = async (request, h) => {
-  const contentType = request.headers['content-type'];
-  const { tutorId } = request.params;
-
   try {
+    const contentType = request.headers['content-type'];
+
+    if (!contentType) {
+      return createResponse(h, 400, 'fail', 'Invalid content-type')
+    }
+
+    const { authorization } = request.headers;
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+    const { tutorId } = decoded;
+
+    if (!tutorId) {
+      return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
+    }
+
     if (contentType.includes('multipart/form-data')) {
       const {
         ktp,
@@ -30,8 +50,12 @@ const updateProfileTutorsHandler = async (request, h) => {
       } = request.payload;
 
       const tutor = await prisma.tutors.findFirst({
-        where: { id: parseInt(tutorId) },
+        where: { id: tutorId },
       });
+
+      if (!tutor) {
+        return createResponse(h, 404, 'fail', 'Tutor not found');
+      }
 
       if (ktp) {
         const currentKtpUrl = tutor.ktp;
@@ -100,7 +124,7 @@ const updateProfileTutorsHandler = async (request, h) => {
       }
 
       const updatedTutor = await prisma.tutors.findFirst({
-        where: { id: parseInt(tutorId) },
+        where: { id: tutorId },
         select: {
           ktp: true,
           profile_picture: true,
@@ -127,14 +151,14 @@ const updateProfileTutorsHandler = async (request, h) => {
 
     // Ambil data tutor dari database untuk mendapatkan nilai saat ini
     const tutor = await prisma.tutors.findFirst({
-      where: { id: parseInt(tutorId) },
+      where: { id: tutorId },
       include: {
         user: true,
       },
     });
 
     // ubah pengembalian respon dengan menggunakan modul createRespon
-    if (!tutor.user) {
+    if (!tutor) {
       return createResponse(h, 404, 'fail', 'Tutor not found');
     }
 
@@ -146,7 +170,7 @@ const updateProfileTutorsHandler = async (request, h) => {
     const emailExists = await prisma.users.findFirst({
       where: {
         email: newEmail,
-        id: { not: parseInt(tutor.user_id) },
+        id: { not: tutor.user_id },
       },
     });
 
@@ -157,7 +181,7 @@ const updateProfileTutorsHandler = async (request, h) => {
     const usernameExists = await prisma.users.findFirst({
       where: {
         username: newUsername,
-        id: { not: parseInt(tutor.user_id) },
+        id: { not: tutor.user_id },
       },
     });
 
@@ -173,7 +197,7 @@ const updateProfileTutorsHandler = async (request, h) => {
 
     // Perbarui data dalam tabel users
     await prisma.users.update({
-      where: { id: parseInt(tutor.user_id) },
+      where: { id: tutor.user_id },
       data: {
         email,
         username,

@@ -8,14 +8,14 @@ const searchLearnersHandler = require('./tutors/searchLearnersHandler');
 const searchByIdLearnersHandler = require('./tutors/searchByIdLearnersHandler');
 const updateProfileLearnersHandler = require('./learners/updateProfileLearnersHandler');
 const updateProfileTutorsHandler = require('./tutors/updateProfileTutorsHandler');
-const deleteFileTutorHandler = require('./tutors/deleteFileTutorsHandler');
-const transactionHandler = require('./midtrans/transactionsHandler');
+const deleteFileTutorsHandler = require('./tutors/deleteFileTutorsHandler');
+const transactionsHandler = require('./midtrans/transactionsHandler');
 const paymentStatusHandler = require('./midtrans/paymentStatusHandler');
 const { deleteOldPendingPayments } = require('./midtrans/deleteOldPendingPayments');
-const tutorProfileHandler = require('./tutors/profileTutorsHandler');
-const learnerProfileHandler = require('./learners/profileLearnersHandler');
-const tutorsHomeHandler = require('./tutors/homeTutorsHandler');
-const learnersHomeHandler = require('./learners/homeLearnersHandler');
+const profileTutorsHandler = require('./tutors/profileTutorsHandler');
+const profileLearnersHandler = require('./learners/profileLearnersHandler');
+const homeTutorsHandler = require('./tutors/homeTutorsHandler');
+const homeLearnersHandler = require('./learners/homeLearnersHandler');
 
 module.exports = {
   signInHandler,
@@ -28,12 +28,12 @@ module.exports = {
   updateProfileLearnersHandler,
   updateProfileTutorsHandler,
   signOutHandler,
-  deleteFileTutorHandler,
-  transactionHandler,
+  deleteFileTutorsHandler,
+  transactionsHandler,
   paymentStatusHandler,
   deleteOldPendingPayments,
-  tutorProfileHandler,
-  learnerProfileHandler,
-  tutorsHomeHandler,
-  learnersHomeHandler,
+  profileTutorsHandler,
+  profileLearnersHandler,
+  homeTutorsHandler,
+  homeLearnersHandler,
 };

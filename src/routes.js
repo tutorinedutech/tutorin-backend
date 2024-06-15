@@ -7,20 +7,20 @@ const {
   updateProfileLearnersHandler,
   updateProfileTutorsHandler,
   signOutHandler,
-  deleteFileTutorHandler,
-  transactionHandler,
+  deleteFileTutorsHandler,
+  transactionsHandler,
   paymentStatusHandler,
-  tutorProfileHandler,
-  learnerProfileHandler,
-  tutorsHomeHandler,
-  learnersHomeHandler,
+  profileTutorsHandler,
+  profileLearnersHandler,
+  homeTutorsHandler,
+  homeLearnersHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
   {
     method: 'GET',
     path: '/',
-    handler: (request, h) => h.response({
+    handler: (h) => h.response({
       status: 'Success',
       message: 'Hello World!',
     }).code(200),
@@ -63,57 +63,42 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/tutors/{tutorId}/home',
-    handler: tutorsHomeHandler,
+    path: '/tutors/home',
+    handler: homeTutorsHandler,
   },
   {
     method: 'GET',
-    path: '/learners/{learnerId}/home',
-    handler: learnersHomeHandler,
+    path: '/learners/home',
+    handler: homeLearnersHandler,
   },
   {
     // buat nyari tutor nanti di sini ('/tutors')
     method: 'GET',
-    path: '/tutors',
+    path: '/tutors/search',
     handler: searchTutorsHandler,
   },
   {
     // buat nampilin data tutor by Id (buat nyari tutor nanti di sini)
     method: 'GET',
-    path: '/tutors/{tutorId}/search',
+    path: '/tutors/search/{tutorId}',
     handler: searchByIdTutorsHandler,
   },
   // buat nampilin data tutor itu sendiri
   {
     method: 'GET',
-    path: '/tutors/my-profile-tutor',
-    handler: tutorProfileHandler,
+    path: '/tutors/my-profile',
+    handler: profileTutorsHandler,
   },
   // buat nampilin data learner itu sendiri
   {
     method: 'GET',
-    path: '/learners/my-profile-learner',
-    handler: learnerProfileHandler,
-  },
-  // untuk melakukan update user dan learner
-  {
-    method: 'PUT',
-    path: '/learners/{id}/profile',
-    options: {
-      payload: {
-        output: 'stream',
-        parse: true,
-        allow: 'multipart/form-data',
-        multipart: true,
-        maxBytes: 2 * 1024 * 1024, // 2 MB limit
-      },
-    },
-    handler: updateProfileLearnersHandler,
+    path: '/learners/my-profile',
+    handler: profileLearnersHandler,
   },
   // untuk melakukan update user dan tutor
   {
     method: 'PUT',
-    path: '/tutors/{tutorId}/profile',
+    path: '/tutors/my-profile',
     options: {
       payload: {
         output: 'data', // 'data' untuk menangani JSON, stream bisa tetap untuk multipart
@@ -127,17 +112,23 @@ const routes = [
     },
     handler: updateProfileTutorsHandler,
   },
+  // untuk melakukan update user dan learner
+  {
+    method: 'PUT',
+    path: '/learners/my-profile',
+    handler: updateProfileLearnersHandler,
+  },
   // untuk menghapus file tutor
   {
     method: 'DELETE',
-    path: '/tutors/{tutorId}/profile',
-    handler: deleteFileTutorHandler,
+    path: '/tutors/my-profile',
+    handler: deleteFileTutorsHandler,
   },
   // untuk melakukan transaksi
   {
     method: 'POST',
     path: '/transactions',
-    handler: transactionHandler,
+    handler: transactionsHandler,
   },
   // untuk mengecek dan menyimpan status pembayaran
   {

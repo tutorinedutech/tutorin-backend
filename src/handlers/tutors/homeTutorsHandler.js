@@ -1,14 +1,23 @@
+const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
 const homeTutorsHandler = async (request, h) => {
   try {
-    const { tutorId } = request.params;
+    const { authorization } = request.headers;
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+    const { tutorId } = decoded;
+
+    if (!tutorId) {
+      return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
+    }
 
     const tutor = await prisma.tutors.findUnique({
-      where: { id: parseInt(tutorId) },
+      where: { id: tutorId },
       select: {
         id: true,
         user_id: true,

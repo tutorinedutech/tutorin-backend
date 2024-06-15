@@ -1,14 +1,23 @@
+const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
 const homeLearnersHandler = async (request, h) => {
   try {
-    const { learnerId } = request.params;
+    const { authorization } = request.headers;
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+    const { learnerId } = decoded;
+
+    if (!learnerId) {
+      return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');
+    }
 
     const learner = await prisma.learners.findUnique({
-      where: { id: parseInt(learnerId) },
+      where: { id: learnerId },
       select: {
         id: true,
         user_id: true,
@@ -44,7 +53,7 @@ const homeLearnersHandler = async (request, h) => {
     return createResponse(h, 200, 'success', 'Successfully get learner data on homepage', result);
   } catch (error) {
     console.error(error);
-    return createResponse(h, 500, 'error', 'Learner data on the homepage cannot be retrieved'); F;
+    return createResponse(h, 500, 'error', 'Learner data on the homepage cannot be retrieved');
   }
 };
 
