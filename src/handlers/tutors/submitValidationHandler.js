@@ -1,246 +1,99 @@
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const submitValidation = async (request, h) => {
-//   const learnerId = parseInt(request.params.learnerId, 10);
-//   const {
-//     tutorId, timestamp, location, proof_image_link,
-//   } = request.payload;
-
-//   if (!tutorId || !timestamp) {
-//     return h.response({ error: 'Invalid data' }).code(400);
-//   }
-
-//   try {
-//     // Cari class_session_id berdasarkan learnerId dan tutorId
-//     const classSession = await prisma.class_sessions.findFirst({
-//       where: {
-//         learner_id: learnerId,
-//         tutor_id: tutorId,
-//       },
-//       select: {
-//         id: true,
-//       },
-//     });
-
-//     if (!classSession) {
-//       return h.response({ error: 'Class session not found' }).code(404);
-//     }
-
-//     // Update data di tabel class_details
-//     const result = await prisma.class_details.updateMany({
-//       where: {
-//         class_session_id: classSession.id,
-//       },
-//       data: {
-//         timestamp: new Date(timestamp),
-//         location,
-//         proof_image_link,
-//         validation_status: 'belum konfirmasi',
-//       },
-//     });
-
-//     return h.response({ status: 'success', data: result }).code(200);
-//   } catch (error) {
-//     console.error(error);
-//     return h.response({ error: error.message }).code(500);
-//   }
-// };
-
-// module.exports = submitValidation;
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 const { PrismaClient } = require('@prisma/client');
+const JWT = require('jsonwebtoken');
+const moment = require('moment-timezone');
+const { uploadValidation } = require('../../uploadFileToGCS');
+const createResponse = require('../../createResponse');
 
 const prisma = new PrismaClient();
+const secret = process.env.JWT_SECRET;
+
+// Fungsi untuk mengunggah berkas dengan penanganan kesalahan
+const handleFileUpload = async (file, uploadFunction) => {
+  try {
+    return await uploadFunction(file);
+  } catch (error) {
+    if (error.code === 400) {
+      return { status: 'fail', message: error.message };
+    }
+    throw error;
+  }
+};
 
 const submitValidation = async (request, h) => {
-  const tutorId = parseInt(request.params.tutorId, 10);
-  const {
-    learnerId, timestamp, location, proof_image_link,
-  } = request.payload;
-
-  // Validate input data
-  if (!learnerId || !tutorId || !timestamp) {
-    return h.response({ error: 'Invalid data' }).code(400);
-  }
-
   try {
-    // Find class sessions matching tutorId and learnerId
-    const classSessions = await prisma.class_sessions.findMany({
+    // Dapatkan token dari header Authorization
+    const { authorization } = request.headers;
+    if (!authorization) {
+      return createResponse(h, 401, 'error', 'Authorization header missing');
+    }
+
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+
+    const { tutorId } = decoded; // Mengambil tutorId dari token
+    console.log('Decoded TutorID:', tutorId);
+
+    if (!tutorId) {
+      return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
+    }
+
+    const { classDetailsId } = request.params;
+    const { location, proofImage } = request.payload;
+
+    // Periksa apakah class detail dengan id yang diberikan ada dan milik tutor yang tepat
+    const classDetail = await prisma.class_details.findFirst({
       where: {
-        tutor_id: tutorId,
-        learner_id: parseInt(learnerId, 10),
-      },
-      select: {
-        id: true,
+        id: parseInt(classDetailsId, 10),
+        classSession: {
+          tutor_id: tutorId,
+        },
       },
     });
 
-    if (!classSessions || classSessions.length === 0) {
-      return h.response({ error: 'Class sessions not found' }).code(404);
+    if (!classDetail) {
+      return createResponse(h, 404, 'error', 'Class detail not found or access denied');
     }
 
-    // Update class_details for each class session found
-    await Promise.all(
-      classSessions.map(async (session) => {
-        // Update class_details where class_session_id matches the pattern
-        const updatedDetails = await prisma.class_details.updateMany({
-          where: {
-            class_session_id: {
-              startsWith: `${learnerId}-${tutorId}-`,
-              endsWith: session.id,
-            },
-          },
-          data: {
-            timestamp: new Date(timestamp),
-            location,
-            proof_image_link,
-            validation_status: 'not validated',
-          },
-        });
+    // Pengecekan apakah class session sebelumnya sudah diapprove
+    if (classDetail.session > 1) {
+      const previousClassDetail = await prisma.class_details.findFirst({
+        where: {
+          class_session_id: classDetail.class_session_id,
+          session: classDetail.session - 1,
+        },
+      });
 
-        console.log(`Updated ${updatedDetails.count} class details for session ${session.id}`);
-      }),
-    );
+      if (!previousClassDetail || previousClassDetail.validation_status !== 'Aprroved') {
+        return createResponse(h, 400, 'error', 'Previous class session must be approved');
+      }
+    }
 
-    // Prepare and return success response
-    const responseData = {
-      learnerId, tutorId, timestamp, location, proof_image_link,
-    };
-    return h.response({ status: 'success', data: responseData }).code(200);
+    // Generate new timestamp in GMT+7 and add 7 hours to it
+    const timestamp = moment().tz('Asia/Jakarta').add(7, 'hours').toDate();
+    const proofImageUrl = proofImage ? await handleFileUpload(proofImage, uploadValidation) : null;
+
+    if (proofImageUrl && proofImageUrl.status === 'fail') {
+      return createResponse(h, 400, 'fail', proofImageUrl.message);
+    }
+
+    // Update class detail dengan data yang diberikan
+    const updatedClassDetail = await prisma.class_details.update({
+      where: {
+        id: parseInt(classDetailsId, 10),
+      },
+      data: {
+        timestamp,
+        location,
+        proof_image_link: proofImageUrl,
+        validation_status: 'not validated',
+      },
+    });
+
+    return createResponse(h, 200, 'success', 'Class detail updated successfully', updatedClassDetail);
   } catch (error) {
-    console.error('Error updating class details:', error);
-    return h.response({ error: error.message }).code(500);
+    console.error(error);
+    return createResponse(h, 500, 'error', 'An error occurred while updating class details', { error: error.message });
   }
 };
 
 module.exports = submitValidation;
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const submitValidation = async (request, h) => {
-//   const tutorId = parseInt(request.params.tutorId, 10);
-//   const session = parseInt(request.params.session, 10); // Ambil session dari params
-//   const { learnerId, timestamp, location, proof_image_link } = request.payload;
-
-//   console.log('Session:', session);
-//   // Validate input data
-//   if (!learnerId || !tutorId || !session || !timestamp) {
-//     return h.response({ error: 'Invalid data' }).code(400);
-//   }
-
-//   try {
-//     // Find class session matching tutorId and learnerId
-//     const classSession = await prisma.class_sessions.findFirst({
-//       where: {
-//         tutor_id: tutorId,
-//         learner_id: parseInt(learnerId, 10),
-//       },
-//       select: {
-//         id: true,
-//       },
-//     });
-
-//     if (!classSession) {
-//       return h.response({ error: 'Class session not found' }).code(404);
-//     }
-
-//     console.log('Class Session ID:', classSession.id);
-//     console.log(typeof(classSession.id));
-
-//     // Check existing class details
-//     const existingDetails = await prisma.class_details.findMany({
-//       where: {
-//         class_session_id: `${learnerId}-${tutorId}-`,
-//         session: session,
-//       },
-//     });
-
-//     console.log('Existing Class Details:', existingDetails);
-
-//     // Update class_details for the specific session
-//     const updatedDetails = await prisma.class_details.updateMany({
-//       where: {
-//         class_session_id: `${learnerId}-${tutorId}-${classSession.id}`, // Form class_session_id
-//         session: session, // Filter berdasarkan session
-//       },
-//       data: {
-//         timestamp: new Date(timestamp),
-//         location,
-//         proof_image_link,
-//         validation_status: 'not validated', // Update validation status as needed
-//       },
-//     });
-
-//     console.log(`Updated ${updatedDetails.count} class details for session ${session}`);
-
-//     // Prepare and return success response
-//     const responseData = { learnerId, tutorId, session, timestamp, location, proof_image_link };
-//     return h.response({ status: 'success', data: responseData }).code(200);
-//   } catch (error) {
-//     console.error('Error updating class details:', error);
-//     return h.response({ error: error.message }).code(500);
-//   }
-// };
-
-// module.exports = submitValidation;
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-
-// const submitValidation = async (request, h) => {
-//   const { learnerId, location, proof_image_link } = request.payload;
-
-//   // Validate input data
-//   if (!learnerId || !location || !proof_image_link) {
-//     return h.response({ error: 'Invalid data' }).code(400);
-//   }
-
-//   try {
-//     // Find class sessions matching learnerId
-//     const classSessions = await prisma.class_sessions.findMany({
-//       where: {
-//         learner_id: learnerId,
-//       },
-//     });
-
-//     if (!classSessions || classSessions.length === 0) {
-//       return h.response({ error: 'No class sessions found for learner' }).code(404);
-//     }
-
-//     // Update class_details for each class session found
-//     await Promise.all(
-//       classSessions.map(async (session) => {
-//         // Update class_details where class_session_id matches the pattern
-//         const updatedDetails = await prisma.class_details.updateMany({
-//           where: {
-//             class_session_id: {
-//               startsWith: `${learnerId}-${session.tutor_id}-`,
-//             },
-//           },
-//           data: {
-//             timestamp: new Date(),
-//             location,
-//             proof_image_link,
-//             validation_status: 'not validated',
-//           },
-//         });
-
-//         console.log(`Updated ${updatedDetails.count} class details for session ${session.id}`);
-//       }),
-//     );
-
-//     // Prepare and return success response
-//     const responseData = { learnerId, location, proof_image_link };
-//     return h.response({ status: 'success', data: responseData }).code(200);
-//   } catch (error) {
-//     console.error('Error updating class details:', error);
-//     return h.response({ error: error.message }).code(500);
-//   }
-// };
-
-// module.exports = submitValidation;

@@ -1,32 +1,42 @@
+const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcrypt');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
 const updateProfileLearnersHandler = async (request, h) => {
-  const { id } = request.params; // Menggunakan id dari URL
-  const {
-    name,
-    email,
-    username,
-    password,
-    educationLevel,
-    phoneNumber,
-    domicile,
-  } = request.payload;
-
   try {
-    // Ambil data learner dari database menggunakan id dari URL
+    const { authorization } = request.headers;
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+    const { learnerId } = decoded;
+
+    if (!learnerId) {
+      return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');
+    }
+
+    const {
+      email,
+      username,
+      password,
+      name,
+      phoneNumber,
+      educationLevel,
+      domicile,
+    } = request.payload;
+
+    // Ambil data learner dari database menggunakan id dari token
     const currentLearner = await prisma.learners.findUnique({
-      where: { id: parseInt(id) }, // Menggunakan id dari URL
+      where: { id: learnerId }, // Menggunakan id dari token
       include: {
         user: true, // Mengambil data user juga
       },
     });
 
     if (!currentLearner) {
-      return createResponse(h, 404, 'fail', `Learner username: ${username} and email: ${email} can't found`);
+      return createResponse(h, 404, 'fail', `Learner's username: ${username} and email: ${email} is not found`);
     }
 
     // Gunakan nilai yang ada jika input kosong
@@ -38,7 +48,7 @@ const updateProfileLearnersHandler = async (request, h) => {
     const emailExists = await prisma.users.findFirst({
       where: {
         email: newEmail,
-        id: { not: parseInt(id) },
+        id: { not: currentLearner.user_id },
       },
     });
 
@@ -49,7 +59,7 @@ const updateProfileLearnersHandler = async (request, h) => {
     const usernameExists = await prisma.users.findFirst({
       where: {
         username: newUsername,
-        id: { not: parseInt(id) },
+        id: { not: currentLearner.user_id },
       },
     });
 
@@ -64,7 +74,7 @@ const updateProfileLearnersHandler = async (request, h) => {
     }
 
     // Perbarui data dalam tabel users
-    const updatedUser = await prisma.users.update({
+    await prisma.users.update({
       where: { id: currentLearner.user_id }, // Menggunakan user_id dari learner
       data: {
         email: newEmail,
@@ -75,8 +85,8 @@ const updateProfileLearnersHandler = async (request, h) => {
     });
 
     // Perbarui data dalam tabel learners
-    const updatedLearner = await prisma.learners.update({
-      where: { id: parseInt(id) },
+    await prisma.learners.update({
+      where: { id: learnerId },
       data: {
         name: newName,
         education_level: educationLevel || currentLearner.education_level,
@@ -85,8 +95,15 @@ const updateProfileLearnersHandler = async (request, h) => {
       },
     });
 
+    const updatedLearner = await prisma.learners.findUnique({
+      where: { id: learnerId }, // Menggunakan id dari token
+      include: {
+        user: true, // Mengambil data user juga
+      },
+    });
+
     // Tanggapi dengan data yang diperbarui
-    return createResponse(h, 200, 'success', 'User and learner data updated successfully', { updatedUser, updatedLearner });
+    return createResponse(h, 200, 'success', 'User and learner data updated successfully', updatedLearner);
   } catch (error) {
     // Tangani kesalahan
     console.error('Error updating user and learner data:', error);

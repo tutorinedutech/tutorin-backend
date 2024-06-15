@@ -1,22 +1,39 @@
+const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { Storage } = require('@google-cloud/storage');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
-const storage = new Storage({
-  projectId: process.env.GOOGLE_PROJECT_ID,
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
+let storage = null;
 
-const deleteFileTutorHandler = async (request, h) => {
+if (process.env.NODE_ENV !== 'production') {
+  storage = new Storage({
+    projectId: process.env.GOOGLE_PROJECT_ID,
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  });
+} else {
+  storage = new Storage();
+}
+
+const bucketName = process.env.GOOGLE_BUCKET_NAME;
+
+const deleteFileTutorsHandler = async (request, h) => {
   try {
-    const { tutorId } = request.params;
+    const { authorization } = request.headers;
+    const token = authorization.replace('Bearer ', '');
+    const decoded = JWT.verify(token, secret);
+    const { tutorId } = decoded;
+
+    if (!tutorId) {
+      return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
+    }
+
     const { file } = request.query;
-    const bucketName = process.env.GOOGLE_BUCKET_NAME;
 
     const tutor = await prisma.tutors.findUnique({
-      where: { id: parseInt(tutorId) },
+      where: { id: tutorId },
     });
 
     if (!tutor) {
@@ -33,7 +50,7 @@ const deleteFileTutorHandler = async (request, h) => {
       });
 
       await prisma.tutors.update({
-        where: { id: parseInt(tutorId) },
+        where: { id: tutorId },
         data: { cv: null },
       });
 
@@ -50,7 +67,7 @@ const deleteFileTutorHandler = async (request, h) => {
       });
 
       await prisma.tutors.update({
-        where: { id: parseInt(tutorId) },
+        where: { id: tutorId },
         data: { profile_picture: null },
       });
 
@@ -63,4 +80,4 @@ const deleteFileTutorHandler = async (request, h) => {
   }
 };
 
-module.exports = deleteFileTutorHandler;
+module.exports = deleteFileTutorsHandler;

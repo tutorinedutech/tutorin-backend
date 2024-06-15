@@ -5,9 +5,8 @@ const createResponse = require('../../createResponse');
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET;
 
-const profileLearnersHandler = async (request, h) => {
+const detailTutoringHandler = async (request, h) => {
   try {
-    // Dapatkan token dari header Authorization
     const { authorization } = request.headers;
     if (!authorization) {
       return createResponse(h, 401, 'error', 'Authorization header missing');
@@ -16,28 +15,28 @@ const profileLearnersHandler = async (request, h) => {
     const token = authorization.replace('Bearer ', '');
     const decoded = JWT.verify(token, secret);
 
-    const { learnerId } = decoded; // Mengambil learnerId dari token
+    const { learnerId } = decoded;
+    console.log('Decoded LearnerID:', learnerId);
 
     if (!learnerId) {
       return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');
     }
 
-    const learners = await prisma.learners.findUnique({
-      where: { id: learnerId },
+    // Query untuk mendapatkan detail class_sessions yang terkait dengan learnerId
+    const learnerSessions = await prisma.class_sessions.findMany({
+      where: {
+        learner_id: learnerId,
+      },
       include: {
-        user: true,
+        classDetails: true,
       },
     });
 
-    if (!learners) {
-      return createResponse(h, 404, 'error', 'learners not found');
-    }
-
-    return createResponse(h, 200, 'success', 'learners profile fetched successfully', learners);
+    return createResponse(h, 200, 'success', 'Learner sessions fetched successfully', learnerSessions);
   } catch (error) {
     console.error(error);
-    return createResponse(h, 500, 'error', 'An error occurred while fetching the learners profile', { error: error.message });
+    return createResponse(h, 500, 'error', 'An error occurred while fetching learner sessions', { error: error.message });
   }
 };
 
-module.exports = profileLearnersHandler;
+module.exports = detailTutoringHandler;
