@@ -5,9 +5,10 @@ const createResponse = require('../../createResponse');
 const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
-const writeReviewsHandler = async (request, h) => {
+const updateReviewsHandler = async (request, h) => {
   try {
     const { authorization } = request.headers;
+
     if (!authorization) {
       return createResponse(h, 401, 'error', 'Authorization header missing');
     }
@@ -22,7 +23,6 @@ const writeReviewsHandler = async (request, h) => {
       return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');
     }
 
-    // cek apakah tutor yang ingin diulas terdapat pada jadwal kelas learner
     const classSession = await prisma.class_sessions.findFirst({
       where: {
         learner_id: learnerId,
@@ -31,7 +31,7 @@ const writeReviewsHandler = async (request, h) => {
     });
 
     if (!classSession) {
-      return createResponse(h, 401, 'fail', 'Cannot write reviews on tutors who are not on the learner\'s class session');
+      return createResponse(h, 401, 'fail', 'Cannot update reviews on tutors who are not on the learner\'s class session');
     }
 
     const {
@@ -46,24 +46,27 @@ const writeReviewsHandler = async (request, h) => {
       },
     });
 
-    if (review) {
-      return createResponse(h, 400, 'fail', 'Learner has written a review for this tutor before');
+    if (!review) {
+      return createResponse(h, 400, 'fail', 'Learner has never written a review about this tutor');
     }
 
-    review = await prisma.reviews.create({
-      data: {
+    review = await prisma.reviews.update({
+      where: {
+        id: review.id,
         learner_id: learnerId,
         tutor_id: parseInt(tutorId),
+      },
+      data: {
         rating,
         comment,
       },
     });
 
-    return createResponse(h, 201, 'Success', 'Successfully wrote a review', review);
+    return createResponse(h, 201, 'Success', 'Successfully update a review', review);
   } catch (error) {
     console.error(error);
-    return createResponse(h, 500, 'error', 'Cannot write review due to an internal error');
+    return createResponse(h, 500, 'error', 'Cannot update review due to an internal error');
   }
 };
 
-module.exports = writeReviewsHandler;
+module.exports = updateReviewsHandler;

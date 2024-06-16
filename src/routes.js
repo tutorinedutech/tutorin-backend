@@ -19,6 +19,7 @@ const {
   detailLearningHandler,
   detailTutoringHandler,
   writeReviewsHandler,
+  updateReviewsHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -183,6 +184,12 @@ const routes = [
     method: 'POST',
     path: '/tutors/{tutorId}/reviews',
     handler: writeReviewsHandler,
+  },
+  // learner dapat memperbarui rating dan ulasan yang sudah ditulis tentang tutor
+  {
+    method: 'PUT',
+    path: '/tutors/{tutorId}/reviews',
+    handler: updateReviewsHandler,
   },
 ];
 
