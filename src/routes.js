@@ -18,6 +18,8 @@ const {
   confirmValidationHandler,
   detailLearningHandler,
   detailTutoringHandler,
+  writeReviewsHandler,
+  updateReviewsHandler,
   searchTopFiveTutorsHandler,
 } = require('./handlers/mainHandler');
 
@@ -178,6 +180,19 @@ const routes = [
     path: '/class-details/detail-tutoring/{classDetailsId}',
     handler: confirmValidationHandler,
   },
+  // learner dapat menulis rating dan ulasan tentang tutor
+  {
+    method: 'POST',
+    path: '/tutors/{tutorId}/reviews',
+    handler: writeReviewsHandler,
+  },
+  // learner dapat memperbarui rating dan ulasan yang sudah ditulis tentang tutor
+  {
+    method: 'PUT',
+    path: '/tutors/{tutorId}/reviews',
+    handler: updateReviewsHandler,
+  },
+  // mendapatkan 5 tutor terbaik
   {
     method: 'GET',
     path: '/tutors/top-rated',
