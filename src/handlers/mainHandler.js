@@ -20,7 +20,7 @@ const submitValidationHandler = require('./tutors/submitValidationHandler');
 const detailLearningHandler = require('./tutors/detailLearningHandler');
 const detailTutoringHandler = require('./learners/detailTutoringHandler');
 const confirmValidationHandler = require('./learners/confirmValidationHandler');
-const searchTopFiveTutorsHandler = require('./learners/searchTop5TutorsHandler');
+const searchTopFiveTutorsHandler = require('./learners/searchTopFiveTutorsHandler');
 
 module.exports = {
 

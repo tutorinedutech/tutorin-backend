@@ -180,7 +180,7 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/class-details/detail-tutoring/{classDetailsId}',
+    path: '/tutors/top-rated',
     handler: searchTopFiveTutorsHandler,
   },
 ];
