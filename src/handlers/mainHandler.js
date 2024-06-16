@@ -20,6 +20,7 @@ const submitValidationHandler = require('./tutors/submitValidationHandler');
 const detailLearningHandler = require('./tutors/detailLearningHandler');
 const detailTutoringHandler = require('./learners/detailTutoringHandler');
 const confirmValidationHandler = require('./learners/confirmValidationHandler');
+const searchTopFiveTutorsHandler = require('./learners/searchTop5TutorsHandler');
 
 module.exports = {
 
@@ -45,4 +46,5 @@ module.exports = {
   confirmValidationHandler,
   detailLearningHandler,
   detailTutoringHandler,
+  searchTopFiveTutorsHandler,
 };
