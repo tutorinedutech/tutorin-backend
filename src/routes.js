@@ -20,6 +20,7 @@ const {
   detailTutoringHandler,
   writeReviewsHandler,
   updateReviewsHandler,
+  searchTopFiveTutorsHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -190,6 +191,12 @@ const routes = [
     method: 'PUT',
     path: '/tutors/{tutorId}/reviews',
     handler: updateReviewsHandler,
+  },
+  // mendapatkan 5 tutor terbaik
+  {
+    method: 'GET',
+    path: '/tutors/top-rated',
+    handler: searchTopFiveTutorsHandler,
   },
 ];
 
