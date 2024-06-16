@@ -34,13 +34,13 @@ const searchTutorsHandler = async (request, h) => {
     // Create filter for availabilities based on provided criteria
     const filter = {
       where: {
-        subject: subject,
+        subject,
         day: day ? { in: day } : undefined, // Filters availabilities that match any of the days in the array
         time: time ? { in: time } : undefined, // Filters availabilities that match any of the times in the array
         tutor: {
           education_level: educationLevel,
-          gender: gender,
-          domicile: domicile,
+          gender,
+          domicile,
           learning_method: learningMethod,
         },
       },
@@ -58,8 +58,8 @@ const searchTutorsHandler = async (request, h) => {
 
     // Use a Set to store unique tutor IDs
     const uniqueTutors = new Map();
-    availabilities.forEach(availability => {
-      const tutor = availability.tutor;
+    availabilities.forEach((availability) => {
+      const { tutor } = availability;
       if (!uniqueTutors.has(tutor.id)) {
         uniqueTutors.set(tutor.id, tutor);
       }

@@ -20,6 +20,8 @@ const submitValidationHandler = require('./tutors/submitValidationHandler');
 const detailLearningHandler = require('./tutors/detailLearningHandler');
 const detailTutoringHandler = require('./learners/detailTutoringHandler');
 const confirmValidationHandler = require('./learners/confirmValidationHandler');
+const writeReviewsHandler = require('./learners/writeReviewsHandler');
+const updateReviewsHandler = require('./learners/updateReviewsHandler');
 
 module.exports = {
 
@@ -45,4 +47,6 @@ module.exports = {
   confirmValidationHandler,
   detailLearningHandler,
   detailTutoringHandler,
+  writeReviewsHandler,
+  updateReviewsHandler,
 };
