@@ -28,7 +28,6 @@ const homeTutorsHandler = async (request, h) => {
             username: true,
           },
         },
-        reviews: true,
         classSessions: true,
       },
     });
@@ -47,9 +46,19 @@ const homeTutorsHandler = async (request, h) => {
       },
     });
 
+    const ratings = await prisma.reviews.findMany({
+      where: { tutor_id: tutor.id },
+      select: { rating: true },
+    });
+
+    const totalRatings = ratings.reduce((acc, review) => acc + review.rating, 0);
+    const averageRating = ratings.length ? (totalRatings / ratings.length) : 0;
+    const formattedRating = parseFloat(averageRating.toFixed(2));
+
     const result = {
       ...tutor,
       classDetails,
+      average_rating: formattedRating,
     };
 
     return createResponse(h, 200, 'success', 'Successfully get tutor data on homepage', result);
