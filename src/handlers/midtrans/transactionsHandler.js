@@ -1,12 +1,28 @@
+const JWT = require('jsonwebtoken');
 const midtransClient = require('midtrans-client');
 const { PrismaClient } = require('@prisma/client');
 const createResponse = require('../../createResponse');
 
+const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
 
 const transactionsHandler = async (request, h) => {
+  const { authorization } = request.headers;
+  if (!authorization) {
+    return createResponse(h, 401, 'error', 'Authorization header missing');
+  }
+
+  const token = authorization.replace('Bearer ', '');
+  const decoded = JWT.verify(token, secret);
+
+  const { learnerId } = decoded;
+
+  if (!learnerId) {
+    return createResponse(h, 400, 'error', 'Invalid token: learnerId missing');
+  }
+
   const {
-    learnerId, tutorId, subject, sessions, price,
+    tutorId, subject, sessions, price,
   } = request.payload;
 
   // Validasi jumlah sesi
@@ -18,7 +34,7 @@ const transactionsHandler = async (request, h) => {
 
   try {
     const learner = await prisma.learners.findUnique({
-      where: { id: parseInt(learnerId) },
+      where: { id: learnerId },
     });
 
     if (!learner) {
@@ -26,7 +42,7 @@ const transactionsHandler = async (request, h) => {
     }
 
     const learnerUser = await prisma.users.findUnique({
-      where: { id: parseInt(learner.user_id) },
+      where: { id: learner.user_id },
     });
 
     if (!learnerUser) {
@@ -45,7 +61,7 @@ const transactionsHandler = async (request, h) => {
     }
 
     const tutorUser = await prisma.users.findUnique({
-      where: { id: parseInt(tutor.user_id) },
+      where: { id: tutor.user_id },
     });
 
     if (!tutorUser) {
@@ -95,7 +111,7 @@ const transactionsHandler = async (request, h) => {
     await prisma.pending_payments.create({
       data: {
         id: parameter.transaction_details.order_id,
-        learner_id: parseInt(learnerId),
+        learner_id: learnerId,
         tutor_id: parseInt(tutorId),
         subject,
         sessions,
