@@ -33,7 +33,12 @@ const detailLearningHandler = async (request, h) => {
       },
     });
 
-    return createResponse(h, 200, 'success', 'Tutor sessions fetched successfully', tutorSessions);
+    // return createResponse(h, 200, 'success', 'Tutor sessions fetched successfully', tutorSessions);
+    return h.response({
+      status: 'success',
+      message: 'Learner sessions fetched successfully',
+      data: tutorSessions,
+    }).code(200);
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'An error occurred while fetching tutor sessions', { error: error.message });
