@@ -31,7 +31,44 @@ const homeLearnersHandler = async (request, h) => {
       },
     });
 
-    // Get the tutors
+    if (!learner) {
+      return createResponse(h, 404, 'fail', 'Learner not found');
+    }
+
+    const classSessionIds = learner.classSessions.map((session) => session.id);
+
+    const classDetails = await prisma.class_details.findMany({
+      where: {
+        class_session_id: {
+          in: classSessionIds,
+        },
+      },
+      include: {
+        classSession: {
+          select: {
+            tutor: {
+              select: {
+                name: true,
+              },
+            },
+            subject: true,
+          },
+        },
+      },
+    });
+
+    const classDetailsWithTutorInfo = classDetails.map((detail) => ({
+      id: detail.id,
+      class_session_id: detail.class_session_id,
+      session: detail.session,
+      timestamp: detail.timestamp,
+      location: detail.location,
+      proof_image_link: detail.proof_image_link,
+      validation_status: detail.validation_status,
+      nameTutor: detail.classSession.tutor.name,
+      subject: detail.classSession.subject,
+    }));
+
     const tutors = await prisma.tutors.findMany({
       select: {
         id: true,
@@ -48,22 +85,8 @@ const homeLearnersHandler = async (request, h) => {
       },
     });
 
-    if (!learner) {
-      return createResponse(h, 404, 'fail', 'Learner not found');
-    }
-
-    const classSessionIds = learner.classSessions.map((session) => session.id);
-
-    const classDetails = await prisma.class_details.findMany({
-      where: {
-        class_session_id: {
-          in: classSessionIds,
-        },
-      },
-    });
-
-    // Calculate average rating for each tutor and fetch subjects
-    const tutorsWithRatingsAndSubjects = await Promise.all(tutors.map(async (tutor) => {
+    // Calculate average rating for each tutor
+    const tutorsWithRatings = await Promise.all(tutors.map(async (tutor) => {
       const ratings = await prisma.reviews.findMany({
         where: { tutor_id: tutor.id },
         select: { rating: true },
@@ -73,29 +96,21 @@ const homeLearnersHandler = async (request, h) => {
       const averageRating = ratings.length ? (totalRatings / ratings.length) : 0;
       const formattedRating = parseFloat(averageRating.toFixed(2));
 
-      const availabilities = await prisma.availabilities.findMany({
-        where: { tutor_id: tutor.id },
-        select: { subject: true },
-      });
-
-      const subjects = availabilities.map((avail) => avail.subject);
-
       return {
         ...tutor,
         average_rating: formattedRating,
-        subjects,
       };
     }));
 
     // Sort tutors by average_rating in descending order
-    tutorsWithRatingsAndSubjects.sort((a, b) => b.average_rating - a.average_rating);
+    tutorsWithRatings.sort((a, b) => b.average_rating - a.average_rating);
 
     // Take the top 5 tutors after sorting
-    const topFiveTutors = tutorsWithRatingsAndSubjects.slice(0, 5);
+    const topFiveTutors = tutorsWithRatings.slice(0, 5);
 
     const result = {
       ...learner,
-      classDetails,
+      classDetails: classDetailsWithTutorInfo,
       topFiveTutors,
     };
 
