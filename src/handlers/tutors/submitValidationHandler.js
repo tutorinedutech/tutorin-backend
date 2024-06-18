@@ -38,7 +38,7 @@ const submitValidationHandler = async (request, h) => {
     }
 
     const { classDetailsId } = request.params;
-    const { location, proofImage } = request.payload;
+    const { timestamp, location, proofImage } = request.payload;
 
     // Periksa apakah class detail dengan id yang diberikan ada dan milik tutor yang tepat
     const classDetail = await prisma.class_details.findFirst({
@@ -69,7 +69,7 @@ const submitValidationHandler = async (request, h) => {
     }
 
     // Generate new timestamp in GMT+7 and add 7 hours to it
-    const timestamp = moment().tz('Asia/Jakarta').add(7, 'hours').toDate();
+    // const timestamp = moment().tz('Asia/Jakarta').add(7, 'hours').toDate();
     const proofImageUrl = proofImage ? await handleFileUpload(proofImage, uploadValidation) : null;
 
     if (proofImageUrl && proofImageUrl.status === 'fail') {
@@ -81,6 +81,7 @@ const submitValidationHandler = async (request, h) => {
       where: {
         id: parseInt(classDetailsId, 10),
       },
+      // timstamp input siswa
       data: {
         timestamp,
         location,
