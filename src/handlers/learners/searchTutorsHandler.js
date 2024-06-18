@@ -26,22 +26,25 @@ const searchTutorsHandler = async (request, h) => {
       gender,
       domicile,
       learningMethod,
+      language,
       subject,
       day,
       time,
     } = request.payload;
 
-    // Create filter for availabilities based on provided criteria
+    // Filter availabilities based on provided criteria
     const filter = {
       where: {
         subject,
-        day: day ? { in: day } : undefined, // Filters availabilities that match any of the days in the array
-        time: time ? { in: time } : undefined, // Filters availabilities that match any of the times in the array
+        day: day ? { in: day } : undefined,
+        time: time ? { in: time } : undefined,
         tutor: {
           education_level: educationLevel,
           gender,
           domicile,
           learning_method: learningMethod,
+          // Apply filter for languages using 'contains' with case-insensitive comparison
+          languages: language ? { contains: language } : undefined,
         },
       },
       select: {
@@ -56,7 +59,7 @@ const searchTutorsHandler = async (request, h) => {
 
     const availabilities = await prisma.availabilities.findMany(filter);
 
-    // Use a Set to store unique tutor IDs
+    // Use a Map to store unique tutor IDs
     const uniqueTutors = new Map();
     availabilities.forEach((availability) => {
       const { tutor } = availability;
@@ -68,7 +71,11 @@ const searchTutorsHandler = async (request, h) => {
     // Convert the Map values to an array
     const uniqueTutorsArray = Array.from(uniqueTutors.values());
 
-    return createResponse(h, 200, 'success', 'Tutors retrieved successfully', uniqueTutorsArray);
+    return h.response({
+      status: 'success',
+      message: 'Tutors retrieved successfully',
+      data: uniqueTutorsArray
+    }).code(200);
   } catch (error) {
     console.error('Error fetching tutors:', error);
     return createResponse(h, 500, 'error', 'Data tutors cannot be retrieved successfully, failed to fetch tutors');
