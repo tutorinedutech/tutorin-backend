@@ -21,6 +21,7 @@ const {
   writeReviewsHandler,
   updateReviewsHandler,
   searchTopFiveTutorsHandler,
+  classDetailsByClassSessionIdHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -197,6 +198,12 @@ const routes = [
     method: 'GET',
     path: '/tutors/top-rated',
     handler: searchTopFiveTutorsHandler,
+  },
+  // mendapatkan detail class berdasarkan classSessionId
+  {
+    method: 'GET',
+    path: '/class-details/{classSessionId}',
+    handler: classDetailsByClassSessionIdHandler,
   },
 ];
 
