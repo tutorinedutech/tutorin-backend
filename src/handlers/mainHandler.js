@@ -23,6 +23,7 @@ const confirmValidationHandler = require('./learners/confirmValidationHandler');
 const writeReviewsHandler = require('./learners/writeReviewsHandler');
 const updateReviewsHandler = require('./learners/updateReviewsHandler');
 const searchTopFiveTutorsHandler = require('./learners/searchTopFiveTutorsHandler');
+const classDetailsByClassSessionIdHandler = require('./learners/classDetailsByClassSessionIdHandler');
 
 module.exports = {
 
@@ -51,4 +52,5 @@ module.exports = {
   writeReviewsHandler,
   updateReviewsHandler,
   searchTopFiveTutorsHandler,
+  classDetailsByClassSessionIdHandler,
 };
