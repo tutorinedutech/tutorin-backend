@@ -65,7 +65,7 @@ const homeLearnersHandler = async (request, h) => {
       location: detail.location,
       proof_image_link: detail.proof_image_link,
       validation_status: detail.validation_status,
-      nameTutor: detail.classSession.tutor.name,
+      tutorName: detail.classSession.tutor.name,
       subject: detail.classSession.subject,
     }));
 

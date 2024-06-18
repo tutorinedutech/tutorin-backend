@@ -28,7 +28,20 @@ const homeTutorsHandler = async (request, h) => {
             username: true,
           },
         },
-        classSessions: true,
+        classSessions: {
+          select: {
+            id: true,
+            learner_id: true,
+            tutor_id: true,
+            sessions: true,
+            subject: true,
+            learner: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -36,8 +49,10 @@ const homeTutorsHandler = async (request, h) => {
       return createResponse(h, 404, 'fail', 'Tutor not found');
     }
 
+    // Extracting the ids of classSessions
     const classSessionIds = tutor.classSessions.map((session) => session.id);
 
+    // Fetch class details and add learnerName and subject from classSessions
     const classDetails = await prisma.class_details.findMany({
       where: {
         class_session_id: {
@@ -46,6 +61,23 @@ const homeTutorsHandler = async (request, h) => {
       },
     });
 
+    // Create a map for fast lookup of classSessions
+    const classSessionMap = tutor.classSessions.reduce((acc, session) => {
+      acc[session.id] = session;
+      return acc;
+    }, {});
+
+    // Adding learnerName and subject to each classDetail using the map
+    const classDetailsWithLearnerInfo = classDetails.map((detail) => {
+      const classSession = classSessionMap[detail.class_session_id];
+      return {
+        ...detail,
+        learnerName: classSession.learner.name,
+        subject: classSession.subject,
+      };
+    });
+
+    // Calculate average rating for the tutor
     const ratings = await prisma.reviews.findMany({
       where: { tutor_id: tutor.id },
       select: { rating: true },
@@ -55,9 +87,10 @@ const homeTutorsHandler = async (request, h) => {
     const averageRating = ratings.length ? (totalRatings / ratings.length) : 0;
     const formattedRating = parseFloat(averageRating.toFixed(2));
 
+    // Construct the final result
     const result = {
       ...tutor,
-      classDetails,
+      classDetails: classDetailsWithLearnerInfo,
       average_rating: formattedRating,
     };
 
