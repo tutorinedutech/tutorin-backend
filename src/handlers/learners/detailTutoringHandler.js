@@ -30,12 +30,15 @@ const detailTutoringHandler = async (request, h) => {
       include: {
         classDetails: true, // Include class details
         tutor: {
-          include: {
+          select: {
             user: {
               select: {
                 username: true,
               },
             },
+            name: true,
+            learning_method: true,
+            profile_picture: true,
           },
         },
       },
@@ -51,6 +54,7 @@ const detailTutoringHandler = async (request, h) => {
       nameTutor: session.tutor.name,
       profilePictureTutor: session.tutor.profile_picture,
       usernameTutor: session.tutor.user.username,
+      learningMethod: session.tutor.learning_method,
       classDetails: session.classDetails,
     }));
 
