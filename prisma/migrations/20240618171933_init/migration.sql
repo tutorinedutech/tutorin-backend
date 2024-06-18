@@ -89,6 +89,20 @@ CREATE TABLE `Class_details` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `Purchases` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `tutor_id` INTEGER NOT NULL,
+    `learner_id` INTEGER NOT NULL,
+    `subject` VARCHAR(191) NOT NULL,
+    `days` VARCHAR(191) NOT NULL,
+    `times` VARCHAR(191) NOT NULL,
+    `learning_method` VARCHAR(191) NOT NULL,
+    `status` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Payment_transactions` (
     `id` VARCHAR(191) NOT NULL,
     `learner_id` INTEGER NOT NULL,
@@ -177,6 +191,12 @@ ALTER TABLE `Class_sessions` ADD CONSTRAINT `Class_sessions_tutor_id_fkey` FOREI
 
 -- AddForeignKey
 ALTER TABLE `Class_details` ADD CONSTRAINT `Class_details_class_session_id_fkey` FOREIGN KEY (`class_session_id`) REFERENCES `Class_sessions`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Purchases` ADD CONSTRAINT `Purchases_tutor_id_fkey` FOREIGN KEY (`tutor_id`) REFERENCES `Tutors`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Purchases` ADD CONSTRAINT `Purchases_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment_transactions` ADD CONSTRAINT `Payment_transactions_learner_id_fkey` FOREIGN KEY (`learner_id`) REFERENCES `Learners`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
