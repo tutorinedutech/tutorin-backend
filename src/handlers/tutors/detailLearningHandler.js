@@ -23,17 +23,42 @@ const detailLearningHandler = async (request, h) => {
       return createResponse(h, 400, 'error', 'Invalid token: tutorId missing');
     }
 
-    // Query to fetch tutor's class sessions with related class details
+    // Query to fetch tutor's class sessions with related class details, learner's name and username
     const tutorSessions = await prisma.class_sessions.findMany({
       where: {
         tutor_id: tutorId,
       },
       include: {
         classDetails: true, // Include related Class_details
+        learner: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return createResponse(h, 200, 'success', 'Tutor sessions fetched successfully', tutorSessions);
+    // Transformasi data untuk menyertakan learner information
+    const transformedData = tutorSessions.map((session) => ({
+      id: session.id,
+      learner_id: session.learner_id,
+      tutor_id: session.tutor_id,
+      sessions: session.sessions,
+      subject: session.subject,
+      nameLearner: session.learner.name,
+      usernameLearner: session.learner.user.username,
+      classDetails: session.classDetails,
+    }));
+
+    return h.response({
+      status: 'success',
+      message: 'Tutor sessions fetched successfully',
+      data: transformedData,
+    }).code(200);
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'An error occurred while fetching tutor sessions', { error: error.message });

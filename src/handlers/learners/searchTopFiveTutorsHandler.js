@@ -22,8 +22,8 @@ const searchTopFiveTutorsHandler = async (request, h) => {
       },
     });
 
-    // Calculate average rating for each tutor
-    const tutorsWithRatings = await Promise.all(tutors.map(async (tutor) => {
+    // Calculate average rating for each tutor and fetch subjects
+    const tutorsWithRatingsAndSubjects = await Promise.all(tutors.map(async (tutor) => {
       const ratings = await prisma.reviews.findMany({
         where: { tutor_id: tutor.id },
         select: { rating: true },
@@ -33,17 +33,25 @@ const searchTopFiveTutorsHandler = async (request, h) => {
       const averageRating = ratings.length ? (totalRatings / ratings.length) : 0;
       const formattedRating = parseFloat(averageRating.toFixed(2));
 
+      const availabilities = await prisma.availabilities.findMany({
+        where: { tutor_id: tutor.id },
+        select: { subject: true },
+      });
+
+      const subjects = availabilities.map((avail) => avail.subject);
+
       return {
         ...tutor,
         average_rating: formattedRating,
+        subjects,
       };
     }));
 
     // Sort tutors by average_rating in descending order
-    tutorsWithRatings.sort((a, b) => b.average_rating - a.average_rating);
+    tutorsWithRatingsAndSubjects.sort((a, b) => b.average_rating - a.average_rating);
 
     // Take the top 5 tutors after sorting
-    const topFiveTutors = tutorsWithRatings.slice(0, 5);
+    const topFiveTutors = tutorsWithRatingsAndSubjects.slice(0, 5);
 
     return createResponse(h, 200, 'success', 'Tutors fetched successfully', topFiveTutors);
   } catch (error) {

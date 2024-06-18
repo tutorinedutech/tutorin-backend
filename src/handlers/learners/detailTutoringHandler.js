@@ -28,11 +28,37 @@ const detailTutoringHandler = async (request, h) => {
         learner_id: learnerId,
       },
       include: {
-        classDetails: true,
+        classDetails: true, // Include class details
+        tutor: {
+          include: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return createResponse(h, 200, 'success', 'Learner sessions fetched successfully', learnerSessions);
+    // Transformasi data untuk menyertakan tutor information
+    const transformedData = learnerSessions.map((session) => ({
+      id: session.id,
+      learner_id: session.learner_id,
+      tutor_id: session.tutor_id,
+      sessions: session.sessions,
+      subject: session.subject,
+      nameTutor: session.tutor.name,
+      profilePictureTutor: session.tutor.profile_picture,
+      usernameTutor: session.tutor.user.username,
+      classDetails: session.classDetails,
+    }));
+
+    return h.response({
+      status: 'success',
+      message: 'Learner sessions fetched successfully',
+      data: transformedData, // Ensure the data is an array
+    }).code(200);
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'An error occurred while fetching learner sessions', { error: error.message });
