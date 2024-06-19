@@ -22,15 +22,15 @@ const searchPurchaseById = async (request, h) => {
         id: parseInt(purchaseId),
       },
       include: {
-        learner: true
-      }
+        learner: true,
+      },
     });
 
-    return createResponse(h, 200, 'success', 'Interested learner was successfully retrieved', purchase)
+    return createResponse(h, 200, 'success', 'Interested learner was successfully retrieved', purchase);
   } catch (error) {
     console.error(error);
     return createResponse(h, 500, 'error', 'Interested learner cannot be retrieved');
   }
-}
+};
 
 module.exports = searchPurchaseById;

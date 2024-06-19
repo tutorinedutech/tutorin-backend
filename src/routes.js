@@ -22,6 +22,8 @@ const {
   updateReviewsHandler,
   searchTopFiveTutorsHandler,
   classDetailsByClassSessionIdHandler,
+  purchasesListHandler,
+  confirmAcceptedLearnerHandler,
   purchasesLearnersHandler,
   searchByIdLearnersHandler,
   searchPurchaseById,
@@ -208,11 +210,25 @@ const routes = [
     path: '/class-details/{classSessionId}',
     handler: classDetailsByClassSessionIdHandler,
   },
+  // melakukan pencarian tutor yang mau dibeli
+  {
+    method: 'POST',
+    path: '/tutors/purchases',
+    handler: purchasesListHandler,
+  },
+  // melakukan penerimaan learner oleh tutor yang mau dibeli
+  {
+    method: 'PUT',
+    path: '/tutors/purchases/{purchasesId}',
+    handler: confirmAcceptedLearnerHandler,
+  },
+  // mendapatkan Wishlist pembelian learner
   {
     method: 'GET',
     path: '/tutors/purchases',
     handler: purchasesLearnersHandler,
   },
+  // mendapatkan wishlist berdasarkan purchaseId
   {
     method: 'GET',
     path: '/tutors/purchases/{purchaseId}',

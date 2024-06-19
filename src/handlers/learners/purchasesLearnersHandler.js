@@ -19,22 +19,22 @@ const purchasesLearnersHandler = async (request, h) => {
     const purchase = await prisma.purchases.findMany({
       where: {
         learner_id: learnerId,
-        status: {not: null},
+        status: { not: null },
       },
       include: {
         tutor: true,
-      }
+      },
     });
 
     return h.response({
       status: 'success',
       message: 'Tutors data that the learner looking for has been successfully retrieved',
-      data: purchase
+      data: purchase,
     }).code(200);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return createResponse(h, 500, 'error', 'Tutors data that the learner is looking for cannot be retrieved');
   }
-}
+};
 
 module.exports = purchasesLearnersHandler;
