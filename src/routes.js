@@ -27,6 +27,7 @@ const {
   purchasesLearnersHandler,
   searchByIdLearnersHandler,
   searchPurchaseById,
+  sendScheduleLearnerHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -185,6 +186,12 @@ const routes = [
     method: 'PUT',
     path: '/class-details/detail-tutoring/{classDetailsId}',
     handler: confirmValidationHandler,
+  },
+  // learner dapat menulis jadwal belajar dan tempat belajar
+  {
+    method: 'PUT',
+    path: '/class-details/detail-tutoring/{classDetailsId}/schedule',
+    handler: sendScheduleLearnerHandler,
   },
   // learner dapat menulis rating dan ulasan tentang tutor
   {
