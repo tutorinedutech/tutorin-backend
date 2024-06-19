@@ -74,7 +74,7 @@ const searchTutorsHandler = async (request, h) => {
     return h.response({
       status: 'success',
       message: 'Tutors retrieved successfully',
-      data: uniqueTutorsArray
+      data: uniqueTutorsArray,
     }).code(200);
   } catch (error) {
     console.error('Error fetching tutors:', error);

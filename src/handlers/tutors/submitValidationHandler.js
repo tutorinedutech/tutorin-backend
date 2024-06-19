@@ -54,6 +54,11 @@ const submitValidationHandler = async (request, h) => {
       return createResponse(h, 404, 'error', 'Class detail not found or access denied');
     }
 
+    // Tambahkan pemeriksaan apakah class detail sudah diapprove
+    if (classDetail.validation_status === 'Approved') {
+      return createResponse(h, 400, 'error', 'Class detail has already been approved and cannot be updated');
+    }
+
     // Pengecekan apakah class session sebelumnya sudah diapprove
     if (classDetail.session > 1) {
       const previousClassDetail = await prisma.class_details.findFirst({
@@ -63,7 +68,7 @@ const submitValidationHandler = async (request, h) => {
         },
       });
 
-      if (!previousClassDetail || previousClassDetail.validation_status !== 'Aprroved') {
+      if (!previousClassDetail || previousClassDetail.validation_status !== 'Approved') {
         return createResponse(h, 400, 'error', 'Previous class session must be approved');
       }
     }

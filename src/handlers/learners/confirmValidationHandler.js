@@ -23,9 +23,8 @@ const confirmValidationHandler = async (request, h) => {
     }
 
     const { classDetailsId } = request.params;
-    // const { validationStatus } = request.payload;
 
-    // Query untuk memperbarui validation_status pada Class_details
+    // Query untuk mendapatkan classDetail berdasarkan id dan learner_id
     const classDetail = await prisma.class_details.findFirst({
       where: {
         id: parseInt(classDetailsId, 10),
@@ -39,12 +38,17 @@ const confirmValidationHandler = async (request, h) => {
       return createResponse(h, 404, 'error', 'Class detail not found or access denied');
     }
 
+    // Tambahkan logika untuk memeriksa apakah validation_status masih null
+    if (classDetail.validation_status === null) {
+      return createResponse(h, 400, 'error', 'You must wait for the tutor to input the validation');
+    }
+
     const updatedClassDetail = await prisma.class_details.update({
       where: {
         id: parseInt(classDetailsId, 10),
       },
       data: {
-        validation_status: 'Aprroved',
+        validation_status: 'Approved',
       },
     });
 

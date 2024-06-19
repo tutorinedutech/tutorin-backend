@@ -112,8 +112,8 @@ model Purchases {
   tutor_id        Int
   learner_id      Int
   subject         String
-  days            String
-  times           String
+  days            Json
+  times           Json
   learning_method String
   status          String?
 

@@ -22,6 +22,8 @@ const {
   updateReviewsHandler,
   searchTopFiveTutorsHandler,
   classDetailsByClassSessionIdHandler,
+  purchasesListHandler,
+  confirmAcceptedLearnerHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -204,6 +206,18 @@ const routes = [
     method: 'GET',
     path: '/class-details/{classSessionId}',
     handler: classDetailsByClassSessionIdHandler,
+  },
+  // melakukan pencarian tutor yang mau dibeli
+  {
+    method: 'POST',
+    path: '/tutors/purchases',
+    handler: purchasesListHandler,
+  },
+  // melakukan penerimaan learner oleh tutor yang mau dibeli
+  {
+    method: 'PUT',
+    path: '/tutors/purchases/{purchasesId}',
+    handler: confirmAcceptedLearnerHandler,
   },
 ];
 
