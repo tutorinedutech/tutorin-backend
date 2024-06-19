@@ -32,6 +32,9 @@ const homeTutorsHandler = async (request, h) => {
         purchases: {
           where: {
             status: null
+          },
+          include: {
+            learner: true,
           }
         },
         classSessions: {

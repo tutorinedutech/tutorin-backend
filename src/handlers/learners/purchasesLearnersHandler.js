@@ -20,6 +20,9 @@ const purchasesLearnersHandler = async (request, h) => {
       where: {
         learner_id: learnerId,
         status: {not: null},
+      },
+      include: {
+        tutor: true,
       }
     });
 

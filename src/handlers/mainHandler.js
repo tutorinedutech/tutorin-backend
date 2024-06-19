@@ -25,6 +25,7 @@ const updateReviewsHandler = require('./learners/updateReviewsHandler');
 const searchTopFiveTutorsHandler = require('./learners/searchTopFiveTutorsHandler');
 const classDetailsByClassSessionIdHandler = require('./learners/classDetailsByClassSessionIdHandler');
 const purchasesLearnersHandler = require('./learners/purchasesLearnersHandler');
+const searchPurchaseById = require('./tutors/searchPurchaseById')
 
 module.exports = {
 
@@ -55,4 +56,6 @@ module.exports = {
   searchTopFiveTutorsHandler,
   classDetailsByClassSessionIdHandler,
   purchasesLearnersHandler,
+  searchByIdLearnersHandler,
+  searchPurchaseById,
 };
