@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const createResponse = require('../../createResponse');
+const { not } = require('joi');
 
 const secret = process.env.JWT_SECRET;
 const prisma = new PrismaClient();
@@ -27,6 +28,14 @@ const homeTutorsHandler = async (request, h) => {
           select: {
             username: true,
           },
+        },
+        purchases: {
+          where: {
+            status: null
+          },
+          include: {
+            learner: true,
+          }
         },
         classSessions: {
           select: {

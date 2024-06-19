@@ -112,15 +112,14 @@ model Purchases {
   tutor_id        Int
   learner_id      Int
   subject         String
-  days            String
-  times           String
+  days            Json
+  times           Json
   learning_method String
   status          String?
 
   tutor           Tutors   @relation(fields: [tutor_id], references: [id]) // Relasi ke tabel Tutors
   learner         Learners @relation(fields: [learner_id], references: [id]) // Relasi ke tabel Learners
 }
-
 
 model Payment_transactions {
   id         String   @id
