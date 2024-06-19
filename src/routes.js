@@ -22,6 +22,7 @@ const {
   updateReviewsHandler,
   searchTopFiveTutorsHandler,
   classDetailsByClassSessionIdHandler,
+  purchasesLearnersHandler,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -208,7 +209,7 @@ const routes = [
   {
     method: 'GET',
     path: '/tutors/purchases',
-    handler: () => {}
+    handler: purchasesLearnersHandler,
   },
 ];
 
