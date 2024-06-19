@@ -7,3 +7,9 @@ We code using the JavaScript programming language and use Hapi as a backned fram
 - Node `21.7.3-alpine3.18`
 - MySql `v.8.0`
 
+## How To Use
+1. git clone `https://github.com/tutorinedutech/tutorin-backend.git`
+2. cd tutorin-backend
+3. nano .env
+4. configure .env with your Mysql, 
+
