@@ -24,6 +24,9 @@ const {
   classDetailsByClassSessionIdHandler,
   purchasesListHandler,
   confirmAcceptedLearnerHandler,
+  purchasesLearnersHandler,
+  searchByIdLearnersHandler,
+  searchPurchaseById,
 } = require('./handlers/mainHandler');
 
 const routes = [
@@ -218,6 +221,18 @@ const routes = [
     method: 'PUT',
     path: '/tutors/purchases/{purchasesId}',
     handler: confirmAcceptedLearnerHandler,
+  },
+  // mendapatkan Wishlist pembelian learner
+  {
+    method: 'GET',
+    path: '/tutors/purchases',
+    handler: purchasesLearnersHandler,
+  },
+  // mendapatkan wishlist berdasarkan purchaseId
+  {
+    method: 'GET',
+    path: '/tutors/purchases/{purchaseId}',
+    handler: searchPurchaseById,
   },
 ];
 

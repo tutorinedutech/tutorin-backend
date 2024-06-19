@@ -121,7 +121,6 @@ model Purchases {
   learner         Learners @relation(fields: [learner_id], references: [id]) // Relasi ke tabel Learners
 }
 
-
 model Payment_transactions {
   id         String   @id
   learner_id Int

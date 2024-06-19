@@ -59,8 +59,8 @@ const purchasesListHandler = async (request, h) => {
       tutor_id: tutorId,
       learner_id: learnerId,
       subject,
-      days: JSON.stringify(days),
-      times: JSON.stringify(times),
+      days,
+      times,
       learning_method: learningMethod,
       status: null,
     }));

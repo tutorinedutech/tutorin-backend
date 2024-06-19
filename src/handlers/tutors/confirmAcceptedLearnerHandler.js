@@ -40,6 +40,11 @@ const confirmAcceptedLearnerHandler = async (request, h) => {
       return createResponse(h, 403, 'error', 'Unauthorized access to purchase');
     }
 
+    // Jika status sudah tidak null, beri pesan bahwa pembelian tidak dapat diedit
+    if (purchase.status !== null) {
+      return createResponse(h, 400, 'error', 'Purchase status cannot be edited');
+    }
+
     // Ambil status baru dari payload
     const { status } = request.payload;
 
