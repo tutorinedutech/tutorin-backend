@@ -5,7 +5,7 @@ const createResponse = require('../../createResponse');
 const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET;
 
-const confirmValidationHandler = async (request, h) => {
+const sendScheduleLearnerHandler = async (request, h) => {
   try {
     const { authorization } = request.headers;
     if (!authorization) {
@@ -23,6 +23,11 @@ const confirmValidationHandler = async (request, h) => {
     }
 
     const { classDetailsId } = request.params;
+    const { timestamp, location } = request.payload;
+
+    if (!timestamp || !location) {
+      return createResponse(h, 400, 'error', 'Missing required fields: timestamp, location, validation_status');
+    }
 
     // Query untuk mendapatkan classDetail berdasarkan id dan learner_id
     const classDetail = await prisma.class_details.findFirst({
@@ -48,7 +53,8 @@ const confirmValidationHandler = async (request, h) => {
         id: parseInt(classDetailsId, 10),
       },
       data: {
-        validation_status: 'Aprroved',
+        timestamp: new Date(timestamp), // Assuming timestamp is in ISO format
+        location,
       },
     });
 
@@ -59,4 +65,4 @@ const confirmValidationHandler = async (request, h) => {
   }
 };
 
-module.exports = confirmValidationHandler;
+module.exports = sendScheduleLearnerHandler;

@@ -55,7 +55,7 @@ const submitValidationHandler = async (request, h) => {
     }
 
     // Tambahkan pemeriksaan apakah class detail sudah diapprove
-    if (classDetail.validation_status === 'Approved') {
+    if (classDetail.validation_status === 'Aprroved') {
       return createResponse(h, 400, 'error', 'Class detail has already been approved and cannot be updated');
     }
 
@@ -68,7 +68,7 @@ const submitValidationHandler = async (request, h) => {
         },
       });
 
-      if (!previousClassDetail || previousClassDetail.validation_status !== 'Approved') {
+      if (!previousClassDetail || previousClassDetail.validation_status !== 'Aprroved') {
         return createResponse(h, 400, 'error', 'Previous class session must be approved');
       }
     }
