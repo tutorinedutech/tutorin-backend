@@ -43,11 +43,6 @@ const sendScheduleLearnerHandler = async (request, h) => {
       return createResponse(h, 404, 'error', 'Class detail not found or access denied');
     }
 
-    // Tambahkan logika untuk memeriksa apakah validation_status masih null
-    if (classDetail.validation_status === null) {
-      return createResponse(h, 400, 'error', 'You must wait for the tutor to input the validation');
-    }
-
     const updatedClassDetail = await prisma.class_details.update({
       where: {
         id: parseInt(classDetailsId, 10),
