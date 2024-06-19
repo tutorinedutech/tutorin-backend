@@ -205,6 +205,11 @@ const routes = [
     path: '/class-details/{classSessionId}',
     handler: classDetailsByClassSessionIdHandler,
   },
+  {
+    method: 'GET',
+    path: '/tutors/purchases',
+    handler: () => {}
+  },
 ];
 
 module.exports = routes;

@@ -94,8 +94,8 @@ CREATE TABLE `Purchases` (
     `tutor_id` INTEGER NOT NULL,
     `learner_id` INTEGER NOT NULL,
     `subject` VARCHAR(191) NOT NULL,
-    `days` VARCHAR(191) NOT NULL,
-    `times` VARCHAR(191) NOT NULL,
+    `days` JSON NOT NULL,
+    `times` JSON NOT NULL,
     `learning_method` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NULL,
 
