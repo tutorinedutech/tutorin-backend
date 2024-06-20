@@ -1,13 +1,22 @@
-# JavaScript Backend API Using Hapi
+# JavaScript Backend API Using Hapi🏹
 
 ## Introduction 👋
 We code using the JavaScript programming language and use Hapi as a backned framework. And for database interaction we use MySql Database Management and Prisma ORM to interact with the database. And to store unstructured data, we use Cloud Storage, which we usually use to store image and PDF data.
 
-## Prerequisite
+## Prerequisite 💪
 - Node `21.7.3-alpine3.18`
 - MySql `v.8.0`
 
-## How To Use
+## File Directory
+- **.github/workflows** We use this folder to configure workflows using Github Actions, so that we will deploy when the main branch is pushed.
+- **prisma** We use this folder to migrate the database using the Prisma ORM package.
+- **src** In this folder we store all the resources we have such as handlers and servers.
+- **handler** In this folder we store all the handlers we need such as learners, midtrans, and tutors.
+- **learners** This folder functions to serve requests from Learners, where learners have the ability to singUp, search for tutors who they want to book as tutors, can access learner home profiles, and make changes to class sessions.
+- **tutors** This folder functions to serve requests from tutors, where tutors have the ability to singUp, accept or reject teaching requests by learners, can access the tutor's home profile, and make changes to class sessions to validate the class being run.
+- **midtrans** This folder functions to serve payment gateway requests from students, where when students make payment by entering the tutor they want to buy, number of sessions, subjects and price. Where the response will return a token to make payments via Midtrans. Apart from that, we will also record the input received from users and midtrans, so that we will create empty classes which will later be updated by the learner to determine the expected hours and adjusted by both parties.
+
+## How To Use 🧐❓
 1. `git clone https://github.com/tutorinedutech/tutorin-backend.git`
 2. `cd tutorin-backend`
 3. `nano .env`
@@ -52,32 +61,40 @@ PORT = YOUR_PORT
     - Create Reverse IP for stability.
 7.  NPM RUN START-PROD
 
-## Routes
-1. `GET /`
-2. `POST /signin`
-3. `POST /signout`
-4. `POST /signuptutors`
-5. `POST /signuptutors`
-6. `GET /tutors/home`
-7. `GET /learners/home`
-8. `POST /tutors`
-9. `GET /tutors/{tutorId}`
-10. `GET /tutors/my-profile`
-11. `GET /learners/my-profile`
-12. `PUT /tutors/my-profile`
-13. `PUT /learners/my-profile`
-14. `DELETE /tutors/my-profile`
-15. `POST /transactions`
-16. `POST /payment-status`
-17. `GET /class-details/detail-learning`
-18. `GET /class-details/detail-tutoring`
-19. `PUT /class-details/detail-learning/{classDetailsId}`
-20. `PUT /class-details/detail-tutoring/{classDetailsId}/schedule`
-21. `POST /tutors/{tutorId}/reviews`
-22. `PUT /tutors/{tutorId}/reviews`
-23. `GET /tutors/top-rated`
-24. `GET /class-details/{classSessionId}`
-25. `POST /tutors/purchases`
-26. `PUT /tutors/purchases/{purchasesId}`
-27. `GET /tutors/purchases`
-28. `GET /tutors/purchases/{purchaseId}`
+## Routes 🤝
+- `GET /`
+-  `POST /signin`
+-  `POST /signout`
+-  `POST /signuptutors`
+-  `POST /signuptutors`
+-  `GET /tutors/home`
+-  `GET /learners/home`
+-  `POST /tutors`
+-  `GET /tutors/{tutorId}`
+-  `GET /tutors/my-profile`
+-  `GET /learners/my-profile`
+-  `PUT /tutors/my-profile`
+-  `PUT /learners/my-profile`
+- `DELETE /tutors/my-profile`
+-  `POST /transactions`
+-  `POST /payment-status`
+-  `GET /class-details/detail-learning`
+-  `GET /class-details/detail-tutoring`
+-  `PUT /class-details/detail-learning/{classDetailsId}`
+- `PUT /class-details/detail-tutoring/{classDetailsId}/schedule`
+-  `POST /tutors/{tutorId}/reviews`
+-  `PUT /tutors/{tutorId}/reviews`
+-  `GET /tutors/top-rated`
+-  `GET /class-details/{classSessionId}`
+- `POST /tutors/purchases`
+-  `PUT /tutors/purchases/{purchasesId}`
+- `GET /tutors/purchases`
+- `GET /tutors/purchases/{purchaseId}`
+
+## Our Postman Template 😎
+
+The link below is the documentation that we have created to be able to carry out integration and testing, where we have explained in detail how to use it and the conditions that are necessary and not necessary in order to get the response that we have set on the server.
+
+[Postman TutorIn](https://documenter.getpostman.com/view/24374519/2sA3XLG5LF#deb2f0ee-829e-41d2-90a8-f100dbea3315)
+
+![image](https://github.com/tutorinedutech/tutorin-backend/assets/128572429/04a39f45-bf14-4485-8832-a0cff4ac5f86)
